@@ -7,7 +7,7 @@ todos:
     status: completed
   - id: data-layer
     content: Build typed recentchanges fetcher (User-Agent), useInfiniteQuery per tab with rccontinue cursor pagination + foreground refetchInterval
-    status: pending
+    status: completed
   - id: merge-util
     content: Implement pure mergeChanges(existing, incoming) dedupe/sort by rcid with unit tests
     status: pending
@@ -42,7 +42,7 @@ isProject: false
 
 Full rationale lives in [architecture.md](./architecture.md). This is the build plan and **current status tracker**.
 
-**Last updated:** 2026-06-25
+**Last updated:** 2026-06-26
 
 ---
 
@@ -50,7 +50,7 @@ Full rationale lives in [architecture.md](./architecture.md). This is the build 
 
 ### Summary
 
-The **UI shell and navigation** are in place with **dummy data**. **Scaffold is complete** — TanStack Query, persistence, env config, and lifecycle managers are wired. **No real API integration yet**.
+The **UI shell and navigation** are in place. **Real Wikimedia API integration** is live on all three tabs with server-side filters, infinite scroll, and foreground polling. Offline banner and live mode still ahead.
 
 | Area | Status |
 |------|--------|
@@ -58,9 +58,10 @@ The **UI shell and navigation** are in place with **dummy data**. **Scaffold is 
 | TanStack Query + persistence | Done |
 | Env config (`EXPO_PUBLIC_*`) | Done |
 | Lifecycle managers (focus/online) | Done |
-| Tab screens + FlashList (dummy) | Done |
+| Wikimedia API + `useRecentChanges` | Done |
+| Tab screens + FlashList (live data) | Done |
 | Detail WebView | Done |
-| Wikimedia API / mock server impl | Not started |
+| Mock server implementation | Not started |
 | Offline banner / live mode | Not started |
 | README / AI_USAGE.md | Not started |
 
@@ -71,11 +72,11 @@ The **UI shell and navigation** are in place with **dummy data**. **Scaffold is 
 - Bottom tabs: **All**, **Articles**, **New pages** (`app/(tabs)/index.tsx`, `articles.tsx`, `new-pages.tsx`)
 - Template boilerplate removed (`EditScreenInfo`, `modal`, second default tab)
 
-**List screen (dummy data)**
-- [`components/ChangesList.tsx`](../mobile-app/components/ChangesList.tsx) — shared `FlashList`, `rcid` keyExtractor, empty state
-- [`components/ChangeListItem.tsx`](../mobile-app/components/ChangeListItem.tsx) — row UI
-- [`data/dummy-changes.ts`](../mobile-app/data/dummy-changes.ts) — 8 sample items, tab filters (namespace / type)
-- [`types/recent-change.ts`](../mobile-app/types/recent-change.ts) — `RecentChange` type (ready for API layer)
+**List screen (live API)**
+- [`hooks/useRecentChanges.ts`](../mobile-app/hooks/useRecentChanges.ts) — `useInfiniteQuery` per tab, 20s foreground refetch
+- [`api/recent-changes.ts`](../mobile-app/api/recent-changes.ts) — fetcher with `User-Agent`, `rccontinue` pagination
+- [`constants/tabs.ts`](../mobile-app/constants/tabs.ts) — filters: All (none), Articles (`rcnamespace=0`), New pages (`rctype=new`)
+- [`components/ChangesList.tsx`](../mobile-app/components/ChangesList.tsx) — loading, error, empty, pull-to-refresh, infinite scroll
 
 **Detail screen**
 - [`app/detail.tsx`](../mobile-app/app/detail.tsx):
@@ -101,9 +102,9 @@ The **UI shell and navigation** are in place with **dummy data**. **Scaffold is 
 
 ### Not started yet
 
-- `recentchanges` fetcher + `useInfiniteQuery` / `useRecentChanges` hook
-- `mergeChanges` dedupe util + tests
-- List: loading, error, offline banner, pull-to-refresh, freshness indicator
+- `mergeChanges` dedupe util + unit tests (basic flatten dedupe in place)
+- Offline banner with `dataUpdatedAt` relative time
+- Freshness indicator ("Updated X ago")
 - Mock server implementation (REST + SSE + scenario panel)
 - SSE live mode toggle
 - Project README + AI_USAGE.md
@@ -132,8 +133,10 @@ v1/
 │   │   └── detail.tsx       ← WebView
 │   ├── components/
 │   ├── data/                ← dummy-changes.ts (temporary)
-│   ├── constants/           ← env.ts
-│   ├── lib/                 ← query-client, persister, managers
+│   ├── api/                 ← recent-changes fetcher
+│   ├── hooks/               ← useRecentChanges
+│   ├── constants/           ← env.ts, tabs.ts
+│   ├── lib/                 ← query-client, persister, managers, mappers
 │   ├── providers/           ← QueryProvider
 │   └── types/
 └── mock-server/             ← empty placeholder (.gitkeep)
@@ -189,10 +192,10 @@ v1/
 ## Build order (cut bottom-up if time runs short)
 
 1. ~~App scaffold~~ ✅
-2. List screen with real API — one tab end-to-end (polling + infinite scroll + states) ← **next**
-3. Remaining tabs + freshness indicator + smooth-refresh polish
+2. ~~List screen with real API~~ ✅
+3. Freshness indicator + smooth-refresh polish ← **next**
 4. ~~Detail WebView~~ ✅
-5. Offline banner; merge/dedupe util + tests (persistence already wired)
+5. Offline banner; merge/dedupe util + tests
 6. Mock server + scenario panel
 7. SSE Live mode toggle
 8. README + AI_USAGE.md
@@ -201,7 +204,7 @@ v1/
 
 ## Next up (recommended)
 
-1. Build `recentchanges` fetcher using `env.apiBaseUrl` + `env.userAgent`
-2. Replace `dummy-changes.ts` with `useInfiniteQuery` (All tab first)
+1. Add freshness indicator (`dataUpdatedAt`) and offline banner
+2. Extract `mergeChanges` util + unit tests for shifting-list correctness
 3. Implement mock server in `mock-server/`
-4. Add offline banner + list loading/error states
+4. SSE live mode toggle

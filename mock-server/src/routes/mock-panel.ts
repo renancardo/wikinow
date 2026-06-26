@@ -66,7 +66,7 @@ function renderPanelHtml(baseUrl: string, port: number): string {
     ${buttons}
 
     <h2>Connect the app</h2>
-    <p>Set these in <code>v1/mobile-app/.env</code> and restart Expo:</p>
+    <p>Set these in <code>mobile-app/.env</code> and restart Expo:</p>
     <pre>EXPO_PUBLIC_API_BASE_URL=${baseUrl}
 EXPO_PUBLIC_STREAM_BASE_URL=${baseUrl}</pre>
     <ul>

@@ -5,7 +5,7 @@ Deterministic stand-in for Wikimedia REST + SSE endpoints used by the WikiNow mo
 ## Quick start
 
 ```bash
-cd v1/mock-server
+cd mock-server
 npm install
 npm run dev
 ```
@@ -25,7 +25,7 @@ Open the control panel at [http://localhost:3000/mock](http://localhost:3000/moc
 
 ## Connect the mobile app
 
-Set in `v1/mobile-app/.env`:
+Set in `/mobile-app/.env`:
 
 ```env
 EXPO_PUBLIC_API_BASE_URL=http://localhost:3000
@@ -44,6 +44,9 @@ Use the `/mock` panel to trigger:
 
 - **Normal** — default catalog + idle SSE
 - **1/sec steady** — one enwiki SSE event per second
+- **5/sec steady** — five enwiki SSE events per second
+- **10/sec steady** — ten enwiki SSE events per second
+- **20/sec steady** — twenty enwiki SSE events per second
 - **Burst** — 10 SSE events on connect, then 1/sec
 - **500 error** — next 3 REST requests fail
 - **Drop connection** — SSE closes after 3 events

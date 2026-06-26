@@ -1,6 +1,6 @@
 # Mock Server — Implementation Plan
 
-**Status:** Implemented in `v1/mock-server/`.
+**Status:** Implemented in `mock-server/`.
 
 Live mode is done in the mobile app. The mock server **deterministically exercises** REST polling, SSE live mode, merge/dedupe, pagination, and failure UX without relying on production Wikimedia traffic.
 
@@ -75,7 +75,7 @@ flowchart LR
 ## Layout
 
 ```
-v1/mock-server/
+mock-server/
   package.json
   tsconfig.json
   .env.example
@@ -112,6 +112,9 @@ Central mutable `ScenarioState` toggled by the `/mock` panel.
 |----------|---------------|--------------|------------------|
 | **Normal** (default) | Paginated catalog, filters applied | Idle until Live on; keepalive comments | Baseline |
 | **1/sec steady** | Normal | Emit 1 enwiki event/sec while connected | Live prepend + stream freshness |
+| **5/sec steady** | Normal | Emit 5 enwiki events/sec | High-rate header/list stress |
+| **10/sec steady** | Normal | Emit 10 enwiki events/sec | Navigation update loop (fixed) |
+| **20/sec steady** | Normal | Emit 20 enwiki events/sec | Peak load testing |
 | **Burst** | Normal | Emit 10 events immediately on connect | `mergeChanges` batch at head |
 | **500 error** | Next N REST requests → HTTP 500 | Unaffected | Error banner + TanStack retry |
 | **Drop connection** | Normal | Close SSE socket after K events | Stream error / reconnect UX |
@@ -131,7 +134,7 @@ Central mutable `ScenarioState` toggled by the `/mock` panel.
 
 ## Manual integration checklist
 
-1. Start mock: `cd v1/mock-server && npm run dev`
+1. Start mock: `cd mock-server && npm run dev`
 2. Point app `.env` at mock; restart Expo
 3. Verify REST list loads, infinite scroll, tab filters
 4. Enable Live → steady stream prepends rows; header shows stream freshness

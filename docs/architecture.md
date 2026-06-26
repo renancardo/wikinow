@@ -5,8 +5,8 @@ questions raised, gives a recommendation per challenge evaluation point (#1–#7
 what was built.
 
 **Implementation status (2026-06-26):** REST polling + optional SSE live mode, offline banner,
-config tab, and theme preference are implemented in `v1/mobile-app/`. Mock server and README
-remain. See [plan.md](./plan.md).
+config tab, theme preference, mock server, README, and AI_USAGE.md are implemented.
+See [plan.md](./plan.md).
 
 ---
 

@@ -37,7 +37,7 @@ todos:
     status: completed
   - id: docs
     content: Write README (run/decisions/freshness/cuts) and AI_USAGE.md
-    status: pending
+    status: completed
 isProject: false
 ---
 
@@ -53,7 +53,7 @@ Full rationale lives in [architecture.md](./architecture.md). Cache details in [
 
 ### Summary
 
-The **mobile app is feature-complete** for the take-home core. The **mock server** is implemented. Remaining deliverable: **README** and **AI_USAGE.md**.
+The **mobile app is feature-complete** for the take-home core. The **mock server** is implemented. **README** and **AI_USAGE.md** are in `/`.
 
 | Area | Status |
 |------|--------|
@@ -72,9 +72,9 @@ The **mobile app is feature-complete** for the take-home core. The **mock server
 | Config tab + persisted `AppConfig` | Done |
 | Theme (system / light / dark) | Done |
 | Mock server implementation | Done |
-| README / AI_USAGE.md | Not started |
+| README / AI_USAGE.md | Done ([`../README.md`](../README.md), [`../AI_USAGE.md`](../AI_USAGE.md)) |
 
-### What exists today (`v1/mobile-app/`)
+### What exists today (`mobile-app/`)
 
 **Navigation**
 - Expo Router stack: `(tabs)` → `detail`
@@ -138,7 +138,18 @@ Global TanStack defaults (`staleTime` 90s, `gcTime` 24h) remain in [`lib/query/q
 
 ### Not started yet
 
-- README + AI_USAGE.md
+_(none — v1 deliverables complete)_
+
+---
+
+## Mock server takeaway
+
+High-rate steady scenarios (`steady-5`, `steady-10`, `steady-20`) exposed two mobile-app bugs that are hard to reproduce against production Wikimedia:
+
+1. **Navigation header crash** — `navigation.setOptions` on every stream tick caused `Maximum update depth exceeded` at 10+/sec. Fixed with `ChangesScreenHeaderContainer` (header registers once; data via hooks).
+2. **REST during Live on tab switch** — only polling was disabled; mount/focus refetches still ran and showed "Updating…". Fixed by suspending REST fetches during `liveMode` and suppressing the updating UI except on pull-to-refresh.
+
+Full write-up: [README § Mock server takeaway](../README.md#mock-server-takeaway).
 
 ---
 
@@ -148,7 +159,7 @@ Global TanStack defaults (`staleTime` 90s, `gcTime` 24h) remain in [`lib/query/q
 - **Data strategy:** REST polling default + optional foreground SSE "Live mode" (implemented)
 - **Live toggle:** Global, in tab header; one SSE connection; tab filters applied client-side on merge
 - **Native SSE transport:** `XMLHttpRequest` + `onprogress` (React Native `fetch` does not stream SSE)
-- **Mock server:** Implemented in `v1/mock-server/` — see [mock-server.md](./mock-server.md)
+- **Mock server:** Implemented in `mock-server/` — see [mock-server.md](./mock-server.md)
 - **Stack:** Expo + Expo Router, TanStack Query, FlashList, react-native-webview
 - **"Changes loaded"** = rows currently shown in the list (after merge + `maxListItems` cap)
 
@@ -157,7 +168,9 @@ Global TanStack defaults (`staleTime` 90s, `gcTime` 24h) remain in [`lib/query/q
 ## Repo layout (actual)
 
 ```
-v1/
+/
+├── README.md
+├── AI_USAGE.md
 ├── docs/
 │   ├── architecture.md
 │   ├── cache-behavior.md
@@ -205,7 +218,7 @@ See [mock-server.md](./mock-server.md) and [`mock-server/README.md`](../mock-ser
 
 - `GET /w/api.php?...recentchanges` — paginated REST with `continue.rccontinue`
 - `GET /v2/stream/recentchange` — SSE live stream
-- `/mock` panel — steady, burst, 500, drop, duplicate/out-of-order, empty, canary
+- `/mock` panel — steady (1/5/10/20 per sec), burst, 500, drop, duplicate/out-of-order, empty, canary
 - App targets it via `EXPO_PUBLIC_API_BASE_URL` and `EXPO_PUBLIC_STREAM_BASE_URL`
 
 ---
@@ -221,8 +234,8 @@ See [mock-server.md](./mock-server.md) and [`mock-server/README.md`](../mock-ser
 ## Deliverables
 
 - [x] Source code in git repository (in progress locally)
-- [ ] README: run steps, decisions/tradeoffs, freshness approach, what was cut
-- [ ] AI_USAGE.md
+- [x] README: run steps, decisions/tradeoffs, freshness approach, what was cut — [`../README.md`](../README.md)
+- [x] AI_USAGE.md — [`../AI_USAGE.md`](../AI_USAGE.md)
 
 ---
 
@@ -237,7 +250,7 @@ See [mock-server.md](./mock-server.md) and [`mock-server/README.md`](../mock-ser
 7. ~~SSE Live mode toggle~~ ✅
 8. ~~Config tab + persisted settings~~ ✅
 9. ~~Mock server + scenario panel~~ ✅
-10. README + AI_USAGE.md ← **next**
+10. ~~README + AI_USAGE.md~~ ✅
 
 ---
 
@@ -250,9 +263,15 @@ See [mock-server.md](./mock-server.md) and [`mock-server/README.md`](../mock-ser
 | [live-mode.md](./live-mode.md) | Live mode architecture, transport, lifecycle, acceptance criteria |
 | [mock-server.md](./mock-server.md) | Mock server plan and integration checklist |
 | [plan.md](./plan.md) | This file — status tracker |
+| [../README.md](../README.md) | Run instructions, decisions, freshness, mock takeaway |
+| [../AI_USAGE.md](../AI_USAGE.md) | AI tool usage disclosure |
 
 ---
 
 ## Next up (recommended)
 
-1. README + AI_USAGE.md
+All v1 deliverables are complete. Optional follow-ups:
+
+1. Automated E2E against mock server scenarios
+2. Update [mock-server.md](./mock-server.md) scenario table with 5/10/20 per sec entries
+3. Zod validation on API responses

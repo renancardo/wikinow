@@ -19,7 +19,7 @@ todos:
     status: completed
   - id: smooth-refresh
     content: Distinguish isLoading vs isFetching, keepPreviousData on tab/page change, stable keyExtractor to avoid flicker/blank
-    status: in_progress
+    status: completed
   - id: detail
     content: Detail WebView screen with own loading/error/retry and back behavior
     status: completed
@@ -64,7 +64,7 @@ The app is **feature-complete for the core flow**: three filtered tabs with live
 | Detail WebView + back behavior | Done |
 | Offline banner | Done |
 | `mergeChanges` util + tests | Done |
-| Smooth refresh polish (`keepPreviousData`) | Partial |
+| Smooth refresh (`keepPreviousData`, scroll stability) | Done |
 | Mock server implementation | Not started |
 | SSE live mode | Not started |
 | README / AI_USAGE.md | Not started |
@@ -80,7 +80,7 @@ The app is **feature-complete for the core flow**: three filtered tabs with live
 - [`hooks/useRecentChanges.ts`](../mobile-app/hooks/useRecentChanges.ts) — `useInfiniteQuery` per tab, **90s** foreground poll (`REFETCH_INTERVAL_MS`), exposes `freshness` + `loadedCount`
 - [`api/recent-changes.ts`](../mobile-app/api/recent-changes.ts) — fetcher with `User-Agent`, `rccontinue` pagination (50/page)
 - [`constants/tabs.ts`](../mobile-app/constants/tabs.ts) — filters: All (none), Articles (`rcnamespace=0`), New pages (`rctype=new`)
-- [`components/ChangesList.tsx`](../mobile-app/components/ChangesList.tsx) — loading, error, empty, pull-to-refresh, infinite scroll; `isLoading` vs `isFetching` split
+- [`components/ChangesList.tsx`](../mobile-app/components/ChangesList.tsx) — `isPending` vs background fetch, `keepPreviousData`, FlashList scroll stability on head updates
 - [`components/ChangesListHeader.tsx`](../mobile-app/components/ChangesListHeader.tsx) — **"X changes loaded"** + **"Updated Xm ago"** (or "Updating…" during refetch)
 - [`types/feed-freshness.ts`](../mobile-app/types/feed-freshness.ts) — `FeedFreshness` + `mergeFeedFreshness()` ready for stream mode
 - [`hooks/useRelativeTime.ts`](../mobile-app/hooks/useRelativeTime.ts) + [`lib/format-relative-time.ts`](../mobile-app/lib/format-relative-time.ts)
@@ -112,7 +112,6 @@ The app is **feature-complete for the core flow**: three filtered tabs with live
 
 ### Not started yet
 
-- `placeholderData: keepPreviousData` for explicit tab-switch smoothness
 - Mock server (REST + SSE + `/mock` scenario panel)
 - SSE live mode toggle (`streamedQuery` + `mergeFeedFreshness`)
 - README + AI_USAGE.md
@@ -206,8 +205,8 @@ v1/
 3. ~~Freshness indicator + loaded count~~ ✅
 4. ~~Detail WebView~~ ✅
 5. ~~Offline banner~~ ✅; ~~`mergeChanges` util + tests~~ ✅
-6. Smooth-refresh polish (`keepPreviousData`) ← **next**
-7. Mock server + scenario panel
+6. ~~Smooth-refresh polish (`keepPreviousData`)~~ ✅
+7. Mock server + scenario panel ← **next**
 8. SSE Live mode toggle
 9. README + AI_USAGE.md
 
@@ -225,7 +224,6 @@ v1/
 
 ## Next up (recommended)
 
-1. Smooth-refresh polish (`keepPreviousData`)
-2. Implement mock server in `mock-server/`
-3. SSE live mode toggle using `mergeFeedFreshness`
-4. README + AI_USAGE.md
+1. Implement mock server in `mock-server/`
+2. SSE live mode toggle using `mergeFeedFreshness`
+3. README + AI_USAGE.md

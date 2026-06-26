@@ -32,7 +32,7 @@ export default function ChangesList({ tab, emptyMessage }: ChangesListProps) {
     freshness,
     isOnline,
     hasCachedData,
-    isLoading,
+    isPending,
     isError,
     error,
     refetch,
@@ -40,9 +40,11 @@ export default function ChangesList({ tab, emptyMessage }: ChangesListProps) {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
+    isShowingPlaceholder,
   } = useRecentChanges(tab);
 
-  const isUpdating = isOnline && isFetching && !isFetchingNextPage;
+  const isUpdating =
+    isOnline && isFetching && !isFetchingNextPage && !isPending;
   const isOffline = !isOnline;
 
   const handlePress = (item: (typeof changes)[number]) => {
@@ -55,7 +57,7 @@ export default function ChangesList({ tab, emptyMessage }: ChangesListProps) {
     });
   };
 
-  if (isLoading && !hasCachedData) {
+  if (isPending && !hasCachedData) {
     return (
       <View style={styles.centered}>
         <ActivityIndicator size="large" color={tint} />
@@ -120,13 +122,20 @@ export default function ChangesList({ tab, emptyMessage }: ChangesListProps) {
       <FlashList
         data={changes}
         keyExtractor={(item) => String(item.rcid)}
+        maintainVisibleContentPosition={
+          hasCachedData
+            ? {
+                autoscrollToTopThreshold: 20,
+              }
+            : undefined
+        }
         ListHeaderComponent={
           <ChangesListHeader
             count={loadedCount}
             hasMore={hasNextPage ?? false}
             lastUpdatedAt={freshness.lastUpdatedAt}
             source={freshness.source}
-            isUpdating={isUpdating}
+            isUpdating={isUpdating || isShowingPlaceholder}
           />
         }
         renderItem={({ item }) => <ChangeListItem item={item} onPress={handlePress} />}

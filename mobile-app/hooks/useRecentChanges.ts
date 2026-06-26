@@ -1,4 +1,4 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { keepPreviousData, useInfiniteQuery } from '@tanstack/react-query';
 
 import { fetchRecentChanges } from '@/api/recent-changes';
 import { TAB_FILTERS, type ChangesTab } from '@/constants/tabs';
@@ -22,6 +22,7 @@ export function useRecentChanges(tab: ChangesTab) {
       }),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) => lastPage.nextCursor,
+    placeholderData: keepPreviousData,
     refetchInterval: isOnline ? REFETCH_INTERVAL_MS : false,
     refetchIntervalInBackground: false,
   });
@@ -42,5 +43,6 @@ export function useRecentChanges(tab: ChangesTab) {
     lastUpdatedAt: freshness.lastUpdatedAt,
     isOnline,
     hasCachedData,
+    isShowingPlaceholder: query.isPlaceholderData,
   };
 }

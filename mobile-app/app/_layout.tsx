@@ -1,11 +1,13 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 
+import SystemBars from '@/components/SystemBars';
+import { getNavigationTheme } from '@/constants/navigation-theme';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import QueryProvider from '@/providers/QueryProvider';
 import { AppConfigProvider } from '@/providers/AppConfigProvider';
@@ -60,8 +62,12 @@ function ThemedNavigation() {
   const colorScheme = useColorScheme();
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
+    <ThemeProvider value={getNavigationTheme(colorScheme ?? 'light')}>
+      <SystemBars />
+      <Stack
+        screenOptions={{
+          headerShadowVisible: false,
+        }}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen
           name="detail"

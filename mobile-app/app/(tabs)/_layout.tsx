@@ -15,12 +15,23 @@ function TabBarIcon(props: {
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const palette = Colors[colorScheme ?? 'light'];
 
   return (
     <LiveModeProvider>
       <Tabs
         screenOptions={{
-          tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+          tabBarActiveTintColor: palette.tint,
+          tabBarInactiveTintColor: palette.tabIconDefault,
+          tabBarStyle: {
+            backgroundColor: palette.background,
+            borderTopColor: palette.border,
+          },
+          headerStyle: {
+            backgroundColor: palette.background,
+          },
+          headerTintColor: palette.text,
+          headerShadowVisible: false,
           headerShown: useClientOnlyValue(false, true),
         }}>
         <Tabs.Screen

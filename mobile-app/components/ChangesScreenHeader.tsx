@@ -22,12 +22,6 @@ type ChangesScreenHeaderProps = {
 export function ChangesScreenHeaderContainer({ tab }: { tab: ChangesTab }) {
   const queryResult = useRecentChangesWithLive(tab);
 
-  const isUpdating =
-    queryResult.isOnline &&
-    queryResult.isFetching &&
-    !queryResult.isFetchingNextPage &&
-    !queryResult.isPending;
-
   return (
     <ChangesScreenHeader
       title={TAB_LABELS[tab]}
@@ -35,7 +29,7 @@ export function ChangesScreenHeaderContainer({ tab }: { tab: ChangesTab }) {
       hasMore={queryResult.hasNextPage ?? false}
       lastUpdatedAt={queryResult.freshness.lastUpdatedAt}
       source={queryResult.freshness.source}
-      isUpdating={isUpdating || queryResult.isShowingPlaceholder}
+      isUpdating={queryResult.isUpdating || queryResult.isShowingPlaceholder}
     />
   );
 }

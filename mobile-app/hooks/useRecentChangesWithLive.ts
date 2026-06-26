@@ -28,6 +28,7 @@ export function useRecentChangesWithLive(tab: ChangesTab) {
 
   const queryResult = useRecentChanges(tab, {
     refetchInterval: isLiveEnabled ? false : config.refetchIntervalMs,
+    liveMode: isLiveEnabled,
   });
 
   const tabStreamChanges = isLiveEnabled
@@ -40,6 +41,7 @@ export function useRecentChangesWithLive(tab: ChangesTab) {
       : queryResult.changes;
 
   const changes = capListItems(mergedChanges, config.maxListItems);
+  const hasCachedData = changes.length > 0;
 
   let freshness: FeedFreshness = queryResult.freshness;
 
@@ -50,6 +52,16 @@ export function useRecentChangesWithLive(tab: ChangesTab) {
     );
   }
 
+  const isRestUpdating =
+    queryResult.isOnline &&
+    queryResult.isFetching &&
+    !queryResult.isFetchingNextPage &&
+    !queryResult.isPending;
+
+  const isUpdating = isLiveEnabled
+    ? queryResult.isFetching && queryResult.isRefetching && !queryResult.isFetchingNextPage
+    : isRestUpdating;
+
   return {
     ...queryResult,
     changes,
@@ -57,5 +69,8 @@ export function useRecentChangesWithLive(tab: ChangesTab) {
     freshness,
     lastUpdatedAt: freshness.lastUpdatedAt,
     isLiveEnabled,
+    hasCachedData,
+    isUpdating,
+    isShowingPlaceholder: queryResult.isShowingPlaceholder && !isLiveEnabled,
   };
 }

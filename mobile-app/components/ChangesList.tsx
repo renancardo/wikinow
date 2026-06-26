@@ -45,11 +45,11 @@ export default function ChangesList({ tab, queryResult, emptyMessage }: ChangesL
     isError,
     error,
     refetch,
-    isFetching,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
     isLiveEnabled,
+    isUpdating,
   } = queryResult;
 
   const headRcid = changes[0]?.rcid ?? null;
@@ -92,8 +92,6 @@ export default function ChangesList({ tab, queryResult, emptyMessage }: ChangesL
     scrollOffsetRef.current = event.nativeEvent.contentOffset.y;
   };
 
-  const isUpdating =
-    isOnline && isFetching && !isFetchingNextPage && !isPending;
   const isOffline = !isOnline;
 
   const handlePress = (item: (typeof changes)[number]) => {

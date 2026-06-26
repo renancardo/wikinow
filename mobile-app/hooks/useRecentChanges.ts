@@ -1,4 +1,4 @@
-import { keepPreviousData, useInfiniteQuery } from '@tanstack/react-query';
+import { keepPreviousData, useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 
 import { fetchRecentChanges } from '@/api/recent-changes';
 import { TAB_FILTERS, type ChangesTab } from '@/constants/tabs';
@@ -9,6 +9,7 @@ import { createFeedFreshness } from '@/types/feed-freshness';
 
 type UseRecentChangesOptions = {
   refetchInterval?: number | false;
+  liveMode?: boolean;
 };
 
 export function useRecentChanges(
@@ -16,15 +17,19 @@ export function useRecentChanges(
   options: UseRecentChangesOptions = {},
 ) {
   const { config } = useAppConfig();
+  const queryClient = useQueryClient();
   const filter = TAB_FILTERS[tab];
   const isOnline = useOnlineStatus();
+  const liveMode = options.liveMode ?? false;
+  const queryKey = ['recentchanges', tab, filter, config.pageSize] as const;
+  const hasRestCache = queryClient.getQueryData(queryKey) != null;
   const pollingInterval =
     options.refetchInterval !== undefined
       ? options.refetchInterval
       : config.refetchIntervalMs;
 
   const query = useInfiniteQuery({
-    queryKey: ['recentchanges', tab, filter, config.pageSize],
+    queryKey,
     queryFn: ({ pageParam, signal }) =>
       fetchRecentChanges({
         filter,
@@ -34,7 +39,11 @@ export function useRecentChanges(
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) => lastPage.nextCursor,
     placeholderData: keepPreviousData,
-    refetchInterval: isOnline ? pollingInterval : false,
+    enabled: !liveMode || hasRestCache,
+    refetchInterval: liveMode ? false : isOnline ? pollingInterval : false,
+    refetchOnWindowFocus: !liveMode,
+    refetchOnMount: !liveMode,
+    staleTime: liveMode ? Infinity : undefined,
     refetchIntervalInBackground: false,
   });
 

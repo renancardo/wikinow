@@ -5,6 +5,7 @@ export type ScenarioName =
   | 'steady'
   | 'steady-5'
   | 'steady-10'
+  | 'steady-20'
   | 'burst'
   | 'error-500'
   | 'drop'
@@ -81,6 +82,15 @@ export function applyScenario(name: ScenarioName): ScenarioState {
         label: '10/sec steady',
         sseMode: 'steady',
         sseSteadyIntervalMs: 100,
+      };
+      break;
+    case 'steady-20':
+      state = {
+        ...DEFAULT_STATE,
+        name,
+        label: '20/sec steady',
+        sseMode: 'steady',
+        sseSteadyIntervalMs: 50,
       };
       break;
     case 'burst':
@@ -167,6 +177,11 @@ export const SCENARIO_OPTIONS: Array<{ name: ScenarioName; label: string; descri
       name: 'steady-10',
       label: '10/sec steady',
       description: 'Emit ten enwiki SSE events per second.',
+    },
+    {
+      name: 'steady-20',
+      label: '20/sec steady',
+      description: 'Emit twenty enwiki SSE events per second.',
     },
     { name: 'burst', label: 'Burst', description: 'Emit 10 SSE events immediately on connect.' },
     { name: 'error-500', label: '500 error', description: 'Next 3 REST requests return HTTP 500.' },

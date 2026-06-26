@@ -33,8 +33,8 @@ todos:
     content: Config tab with persisted app settings (polling, page size, theme, live debug logs, list caps)
     status: completed
   - id: mock-server
-    content: "TypeScript mock server: REST + SSE endpoints + /mock scenario panel (1/sec, burst, slow, 500, drop, duplicate/out-of-order, empty)"
-    status: pending
+    content: "TypeScript mock server: REST + SSE endpoints + /mock scenario panel (1/sec, burst, 500, drop, duplicate/out-of-order, empty)"
+    status: completed
   - id: docs
     content: Write README (run/decisions/freshness/cuts) and AI_USAGE.md
     status: pending
@@ -53,7 +53,7 @@ Full rationale lives in [architecture.md](./architecture.md). Cache details in [
 
 ### Summary
 
-The **mobile app is feature-complete** for the take-home core: three filtered tabs with Wikimedia REST data, infinite scroll, configurable polling, offline support, WebView detail, optional **Live mode** (SSE), and a **Config** tab for runtime tuning. Remaining work is the **mock server** and **deliverables** (README, AI_USAGE.md).
+The **mobile app is feature-complete** for the take-home core. The **mock server** is implemented. Remaining deliverable: **README** and **AI_USAGE.md**.
 
 | Area | Status |
 |------|--------|
@@ -71,7 +71,7 @@ The **mobile app is feature-complete** for the take-home core: three filtered ta
 | SSE live mode (global toggle, `streamedQuery`) | Done |
 | Config tab + persisted `AppConfig` | Done |
 | Theme (system / light / dark) | Done |
-| Mock server implementation | Not started |
+| Mock server implementation | Done |
 | README / AI_USAGE.md | Not started |
 
 ### What exists today (`v1/mobile-app/`)
@@ -138,7 +138,6 @@ Global TanStack defaults (`staleTime` 90s, `gcTime` 24h) remain in [`lib/query/q
 
 ### Not started yet
 
-- Mock server (REST + SSE + `/mock` scenario panel)
 - README + AI_USAGE.md
 
 ---
@@ -149,7 +148,7 @@ Global TanStack defaults (`staleTime` 90s, `gcTime` 24h) remain in [`lib/query/q
 - **Data strategy:** REST polling default + optional foreground SSE "Live mode" (implemented)
 - **Live toggle:** Global, in tab header; one SSE connection; tab filters applied client-side on merge
 - **Native SSE transport:** `XMLHttpRequest` + `onprogress` (React Native `fetch` does not stream SSE)
-- **Mock server:** In scope for v1 (not built yet)
+- **Mock server:** Implemented in `v1/mock-server/` — see [mock-server.md](./mock-server.md)
 - **Stack:** Expo + Expo Router, TanStack Query, FlashList, react-native-webview
 - **"Changes loaded"** = rows currently shown in the list (after merge + `maxListItems` cap)
 
@@ -163,6 +162,7 @@ v1/
 │   ├── architecture.md
 │   ├── cache-behavior.md
 │   ├── live-mode.md
+│   ├── mock-server.md
 │   └── plan.md              ← this file
 ├── mobile-app/
 │   ├── app/
@@ -180,7 +180,7 @@ v1/
 │   │   └── utils/           ← change-type map, format-relative-time
 │   ├── providers/           ← QueryProvider, AppConfigProvider, LiveModeProvider
 │   └── types/               ← recent-change, feed-freshness, stream-recent-change, wiki-recent-change
-└── mock-server/             ← empty placeholder (.gitkeep)
+└── mock-server/             ← Hono REST + SSE + /mock panel (see mock-server/README.md)
 ```
 
 ---
@@ -199,11 +199,13 @@ v1/
 
 ---
 
-## Mock server (planned)
+## Mock server (implemented)
 
-- `GET /w/api.php?...recentchanges` (matches real JSON incl. `continue.rccontinue`)
-- `GET /v2/stream/recentchange` SSE
-- `/mock` panel: 1/sec, burst, slow network, 500, drop connection, duplicate/out-of-order ids, empty
+See [mock-server.md](./mock-server.md) and [`mock-server/README.md`](../mock-server/README.md).
+
+- `GET /w/api.php?...recentchanges` — paginated REST with `continue.rccontinue`
+- `GET /v2/stream/recentchange` — SSE live stream
+- `/mock` panel — steady, burst, 500, drop, duplicate/out-of-order, empty, canary
 - App targets it via `EXPO_PUBLIC_API_BASE_URL` and `EXPO_PUBLIC_STREAM_BASE_URL`
 
 ---
@@ -234,8 +236,8 @@ v1/
 6. ~~Smooth-refresh polish~~ ✅
 7. ~~SSE Live mode toggle~~ ✅
 8. ~~Config tab + persisted settings~~ ✅
-9. Mock server + scenario panel ← **next**
-10. README + AI_USAGE.md
+9. ~~Mock server + scenario panel~~ ✅
+10. README + AI_USAGE.md ← **next**
 
 ---
 
@@ -246,11 +248,11 @@ v1/
 | [architecture.md](./architecture.md) | REST vs SSE strategy, eval criteria, stack decisions |
 | [cache-behavior.md](./cache-behavior.md) | TanStack cache model, live stream query, config-driven timing |
 | [live-mode.md](./live-mode.md) | Live mode architecture, transport, lifecycle, acceptance criteria |
+| [mock-server.md](./mock-server.md) | Mock server plan and integration checklist |
 | [plan.md](./plan.md) | This file — status tracker |
 
 ---
 
 ## Next up (recommended)
 
-1. Implement mock server in `mock-server/`
-2. README + AI_USAGE.md
+1. README + AI_USAGE.md

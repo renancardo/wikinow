@@ -145,7 +145,7 @@ Implications:
 
 - If the user scrolled to 3 pages (~150 items), a refetch may hit the API 3 times.
 - The recent-changes feed **shifts** underneath you; refetched page 1 may contain new edits at the head.
-- Full correctness when merging head updates with paginated tail is the job of the planned `mergeChanges` util (today: simple flatten + dedupe only).
+- Full correctness when merging head refresh into paginated tail is the job of [`mergeChanges`](../mobile-app/lib/merge-changes.ts) (incoming wins on duplicate `rcid`, sorted by `rcid` desc). `flattenRecentChangesPages` chains `mergeChanges` across pages.
 
 ---
 
@@ -202,7 +202,7 @@ Look for keys starting with `['recentchanges', ...]`.
 
 | Feature | Impact on cache |
 |---------|-----------------|
-| `mergeChanges` util | Smarter merge on refetch; cache shape unchanged |
+| `mergeChanges` util | Smarter merge on refetch; used by `flattenRecentChangesPages` |
 | Offline banner | Reads `onlineManager` + persisted cache + `freshness` |
 | SSE live mode | Stream prepends to list; `mergeFeedFreshness` for timestamps |
 | Mock server | Same cache model; `EXPO_PUBLIC_API_BASE_URL` points to mock |

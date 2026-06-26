@@ -10,7 +10,7 @@ todos:
     status: completed
   - id: merge-util
     content: Implement pure mergeChanges(existing, incoming) dedupe/sort by rcid with unit tests
-    status: pending
+    status: completed
   - id: list-screen
     content: List screen with FlashList, tabs (All / Articles ns0 / New pages), loading/empty/error states, pull-to-refresh, loaded count + freshness indicator
     status: completed
@@ -62,9 +62,9 @@ The app is **feature-complete for the core flow**: three filtered tabs with live
 | List UI (FlashList, states, pull-to-refresh) | Done |
 | Loaded count + freshness indicator | Done |
 | Detail WebView + back behavior | Done |
-| Smooth refresh polish (`keepPreviousData`) | Partial |
 | Offline banner | Done |
-| `mergeChanges` util + tests | Not started |
+| `mergeChanges` util + tests | Done |
+| Smooth refresh polish (`keepPreviousData`) | Partial |
 | Mock server implementation | Not started |
 | SSE live mode | Not started |
 | README / AI_USAGE.md | Not started |
@@ -84,7 +84,9 @@ The app is **feature-complete for the core flow**: three filtered tabs with live
 - [`components/ChangesListHeader.tsx`](../mobile-app/components/ChangesListHeader.tsx) — **"X changes loaded"** + **"Updated Xm ago"** (or "Updating…" during refetch)
 - [`types/feed-freshness.ts`](../mobile-app/types/feed-freshness.ts) — `FeedFreshness` + `mergeFeedFreshness()` ready for stream mode
 - [`hooks/useRelativeTime.ts`](../mobile-app/hooks/useRelativeTime.ts) + [`lib/format-relative-time.ts`](../mobile-app/lib/format-relative-time.ts)
-- [`lib/recent-changes.ts`](../mobile-app/lib/recent-changes.ts) — API mapping + basic page flatten/dedupe by `rcid`
+- [`lib/recent-changes.ts`](../mobile-app/lib/recent-changes.ts) — API mapping + `flattenRecentChangesPages` via `mergeChanges`
+- [`lib/merge-changes.ts`](../mobile-app/lib/merge-changes.ts) — dedupe by `rcid`, incoming wins, sort newest-first
+- [`components/OfflineBanner.tsx`](../mobile-app/components/OfflineBanner.tsx) + [`hooks/useOnlineStatus.ts`](../mobile-app/hooks/useOnlineStatus.ts)
 
 > **Cache model:** per tab query → pages (one per API request), not per item. See [cache-behavior.md](./cache-behavior.md).
 
@@ -93,8 +95,8 @@ The app is **feature-complete for the core flow**: three filtered tabs with live
 
 **Infrastructure**
 - [`providers/QueryProvider.tsx`](../mobile-app/providers/QueryProvider.tsx) — `PersistQueryClientProvider` + devtools
-- [`lib/query-client.ts`](../mobile-app/lib/query-client.ts) — defaults (`staleTime` 30s, `gcTime` 24h)
-- [`lib/async-storage-persister.ts`](../mobile-app/lib/async-storage-persister.ts) — cache persistence (wired, no offline UI yet)
+- [`lib/query-client.ts`](../mobile-app/lib/query-client.ts) — defaults (`staleTime` 90s, `gcTime` 24h)
+- [`lib/async-storage-persister.ts`](../mobile-app/lib/async-storage-persister.ts) — cache persistence + offline last-known-good
 - [`lib/setup-query-managers.ts`](../mobile-app/lib/setup-query-managers.ts) — `focusManager` + `onlineManager`
 - [`constants/env.ts`](../mobile-app/constants/env.ts) + [`app.config.ts`](../mobile-app/app.config.ts) + `.env.example`
 - [`mock-server/`](../mock-server/) — empty placeholder (`.gitkeep`)
@@ -110,8 +112,6 @@ The app is **feature-complete for the core flow**: three filtered tabs with live
 
 ### Not started yet
 
-- Offline banner ("Offline — showing data from Xm ago") using `onlineManager` + persisted cache — [`components/OfflineBanner.tsx`](../mobile-app/components/OfflineBanner.tsx), [`hooks/useOnlineStatus.ts`](../mobile-app/hooks/useOnlineStatus.ts)
-- Full `mergeChanges` util + unit tests (basic dedupe in `flattenRecentChangesPages` only)
 - `placeholderData: keepPreviousData` for explicit tab-switch smoothness
 - Mock server (REST + SSE + `/mock` scenario panel)
 - SSE live mode toggle (`streamedQuery` + `mergeFeedFreshness`)
@@ -160,9 +160,8 @@ v1/
 | `useInfiniteQuery` + `rccontinue` pagination | Done |
 | Server-side tab filters | Done |
 | Foreground `refetchInterval` polling | Done |
-| `mergeChanges` for shifting list | Partial (flatten dedupe only) |
-| Freshness indicator | Done |
-| Offline banner | Pending |
+| `mergeChanges` for shifting list | Done |
+| Offline banner | Done |
 | Live SSE mode | Pending |
 
 ---
@@ -206,8 +205,8 @@ v1/
 2. ~~List screen with real API~~ ✅
 3. ~~Freshness indicator + loaded count~~ ✅
 4. ~~Detail WebView~~ ✅
-5. ~~Offline banner~~ ✅; `mergeChanges` util + tests ← **next**
-6. Smooth-refresh polish (`keepPreviousData`)
+5. ~~Offline banner~~ ✅; ~~`mergeChanges` util + tests~~ ✅
+6. Smooth-refresh polish (`keepPreviousData`) ← **next**
 7. Mock server + scenario panel
 8. SSE Live mode toggle
 9. README + AI_USAGE.md
@@ -226,8 +225,7 @@ v1/
 
 ## Next up (recommended)
 
-1. Extract `mergeChanges` util + unit tests for head-refresh / pagination correctness
-2. Smooth-refresh polish (`keepPreviousData`)
-3. Implement mock server in `mock-server/`
-4. SSE live mode toggle using `mergeFeedFreshness`
-5. README + AI_USAGE.md
+1. Smooth-refresh polish (`keepPreviousData`)
+2. Implement mock server in `mock-server/`
+3. SSE live mode toggle using `mergeFeedFreshness`
+4. README + AI_USAGE.md

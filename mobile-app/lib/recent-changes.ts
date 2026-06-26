@@ -1,5 +1,7 @@
 import type { ChangeType, RecentChange } from '@/types/recent-change';
 
+import { mergeChanges } from '@/lib/merge-changes';
+
 type WikiChangeType = 'edit' | 'new' | 'log' | 'categorize';
 
 export type WikiRecentChangeRaw = {
@@ -57,18 +59,8 @@ export function buildPageUrl(apiBaseUrl: string, title: string): string {
 }
 
 export function flattenRecentChangesPages(pages: RecentChangesPage[]): RecentChange[] {
-  const seen = new Set<number>();
-  const result: RecentChange[] = [];
-
-  for (const page of pages) {
-    for (const change of page.changes) {
-      if (seen.has(change.rcid)) {
-        continue;
-      }
-      seen.add(change.rcid);
-      result.push(change);
-    }
-  }
-
-  return result;
+  return pages.reduce(
+    (accumulated, page) => mergeChanges(accumulated, page.changes, 'append'),
+    [] as RecentChange[],
+  );
 }

@@ -1,7 +1,6 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Tabs } from 'expo-router';
 
-import LiveToggle from '@/components/LiveToggle';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useClientOnlyValue } from '@/hooks/useClientOnlyValue';
@@ -29,7 +28,6 @@ export default function TabLayout() {
           options={{
             title: 'All',
             tabBarIcon: ({ color }) => <TabBarIcon name="list" color={color} />,
-            headerRight: () => <LiveToggle />,
           }}
         />
         <Tabs.Screen
@@ -37,7 +35,6 @@ export default function TabLayout() {
           options={{
             title: 'Articles',
             tabBarIcon: ({ color }) => <TabBarIcon name="file-text-o" color={color} />,
-            headerRight: () => <LiveToggle />,
           }}
         />
         <Tabs.Screen
@@ -45,7 +42,6 @@ export default function TabLayout() {
           options={{
             title: 'New pages',
             tabBarIcon: ({ color }) => <TabBarIcon name="plus-square-o" color={color} />,
-            headerRight: () => <LiveToggle />,
           }}
         />
         <Tabs.Screen

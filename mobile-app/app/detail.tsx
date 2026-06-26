@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, BackHandler, Platform, Pressable, StyleSheet } from 'react-native';
 import WebView from 'react-native-webview';
 import type { WebViewNavigation } from 'react-native-webview';
-
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, View } from '@/components/Themed';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
@@ -88,7 +88,7 @@ export default function DetailScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       {loading && (
         <View style={styles.loadingOverlay}>
           <ActivityIndicator size="large" color={tint} />
@@ -115,7 +115,7 @@ export default function DetailScreen() {
           setError(true);
         }}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 

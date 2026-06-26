@@ -1,5 +1,5 @@
-import ChangesList from '@/components/ChangesList';
+import ChangesTabScreen from '@/components/ChangesTabScreen';
 
 export default function NewPagesScreen() {
-  return <ChangesList tab="new-pages" />;
+  return <ChangesTabScreen tab="new-pages" />;
 }

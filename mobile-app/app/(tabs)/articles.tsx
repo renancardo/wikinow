@@ -1,5 +1,5 @@
-import ChangesList from '@/components/ChangesList';
+import ChangesTabScreen from '@/components/ChangesTabScreen';
 
 export default function ArticlesScreen() {
-  return <ChangesList tab="articles" />;
+  return <ChangesTabScreen tab="articles" />;
 }

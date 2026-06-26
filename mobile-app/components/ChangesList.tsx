@@ -11,7 +11,6 @@ import {
 } from 'react-native';
 
 import ChangeListItem from '@/components/ChangeListItem';
-import ChangesListHeader from '@/components/ChangesListHeader';
 import OfflineBanner from '@/components/OfflineBanner';
 import { Text, View } from '@/components/Themed';
 import { TAB_EMPTY_MESSAGES, type ChangesTab } from '@/constants/tabs';
@@ -24,10 +23,11 @@ const LIVE_PIN_THRESHOLD = 150;
 
 type ChangesListProps = {
   tab: ChangesTab;
+  queryResult: ReturnType<typeof useRecentChangesWithLive>;
   emptyMessage?: string;
 };
 
-export default function ChangesList({ tab, emptyMessage }: ChangesListProps) {
+export default function ChangesList({ tab, queryResult, emptyMessage }: ChangesListProps) {
   const router = useRouter();
   const colorScheme = useColorScheme();
   const tint = Colors[colorScheme ?? 'light'].tint;
@@ -37,7 +37,6 @@ export default function ChangesList({ tab, emptyMessage }: ChangesListProps) {
 
   const {
     changes,
-    loadedCount,
     freshness,
     isOnline,
     hasCachedData,
@@ -49,9 +48,8 @@ export default function ChangesList({ tab, emptyMessage }: ChangesListProps) {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-    isShowingPlaceholder,
     isLiveEnabled,
-  } = useRecentChangesWithLive(tab);
+  } = queryResult;
 
   const headRcid = changes[0]?.rcid ?? null;
 
@@ -173,15 +171,6 @@ export default function ChangesList({ tab, emptyMessage }: ChangesListProps) {
                 autoscrollToTopThreshold: isLiveEnabled ? LIVE_PIN_THRESHOLD : 20,
               }
             : undefined
-        }
-        ListHeaderComponent={
-          <ChangesListHeader
-            count={loadedCount}
-            hasMore={hasNextPage ?? false}
-            lastUpdatedAt={freshness.lastUpdatedAt}
-            source={freshness.source}
-            isUpdating={isUpdating || isShowingPlaceholder}
-          />
         }
         renderItem={({ item }) => <ChangeListItem item={item} onPress={handlePress} />}
         refreshControl={

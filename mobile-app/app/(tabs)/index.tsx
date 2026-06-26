@@ -1,5 +1,5 @@
-import ChangesList from '@/components/ChangesList';
+import ChangesTabScreen from '@/components/ChangesTabScreen';
 
 export default function AllChangesScreen() {
-  return <ChangesList tab="all" />;
+  return <ChangesTabScreen tab="all" />;
 }

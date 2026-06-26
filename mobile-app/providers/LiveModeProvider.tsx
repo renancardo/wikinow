@@ -95,6 +95,13 @@ export function LiveModeProvider({ children }: { children: ReactNode }) {
   }, [queryClient]);
 
   useEffect(() => {
+    if (!isFocused && isLiveEnabled) {
+      liveLog('turning off live mode on background');
+      setLiveEnabled(false);
+    }
+  }, [isFocused, isLiveEnabled]);
+
+  useEffect(() => {
     if (!streamActive) {
       stopLiveStream(queryClient);
     }

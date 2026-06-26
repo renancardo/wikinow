@@ -1,8 +1,12 @@
 # NextMe Take-Home — Architecture & Approach Discussion (v1)
 
-This document captures the technical discussion before writing any code. It answers the
-questions raised, gives a recommendation per challenge evaluation point (#1–#7), and flags
-the open decisions. Goal: strong judgment on a small surface, not everything half-finished.
+This document captures the technical discussion before and during implementation. It answers the
+questions raised, gives a recommendation per challenge evaluation point (#1–#7), and records
+what was built.
+
+**Implementation status (2026-06-26):** REST polling + optional SSE live mode, offline banner,
+config tab, and theme preference are implemented in `v1/mobile-app/`. Mock server and README
+remain. See [plan.md](./plan.md).
 
 ---
 

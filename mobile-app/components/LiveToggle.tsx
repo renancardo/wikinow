@@ -13,7 +13,6 @@ export default function LiveToggle() {
   const {
     isLiveEnabled,
     toggleLive,
-    streamActive,
     isStreamConnected,
     isStreamConnecting,
     isStreamError,
@@ -29,8 +28,6 @@ export default function LiveToggle() {
     label = 'Live · on';
   } else if (isOn && isStreamConnecting) {
     label = 'Live · connecting';
-  } else if (isOn && !streamActive) {
-    label = 'Live · paused';
   } else if (isOn) {
     label = 'Live · starting';
   }

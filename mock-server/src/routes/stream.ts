@@ -103,7 +103,7 @@ async function runStreamLoop(
 
       if (scenario.sseMode === 'steady' || scenario.sseMode === 'burst') {
         emit([createLiveStreamEvent(getNextLiveEventId(), baseUrl)]);
-        await sleep(1000, signal);
+        await sleep(scenario.sseSteadyIntervalMs, signal);
         continue;
       }
 

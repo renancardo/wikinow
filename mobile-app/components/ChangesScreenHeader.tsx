@@ -5,7 +5,9 @@ import ChangesListHeader from '@/components/ChangesListHeader';
 import LiveToggle from '@/components/LiveToggle';
 import { Text, View } from '@/components/Themed';
 import Colors from '@/constants/Colors';
+import { TAB_LABELS, type ChangesTab } from '@/constants/tabs';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { useRecentChangesWithLive } from '@/hooks/useRecentChangesWithLive';
 import type { FeedFreshnessSource } from '@/types/feed-freshness';
 
 type ChangesScreenHeaderProps = {
@@ -16,6 +18,27 @@ type ChangesScreenHeaderProps = {
   source: FeedFreshnessSource;
   isUpdating: boolean;
 };
+
+export function ChangesScreenHeaderContainer({ tab }: { tab: ChangesTab }) {
+  const queryResult = useRecentChangesWithLive(tab);
+
+  const isUpdating =
+    queryResult.isOnline &&
+    queryResult.isFetching &&
+    !queryResult.isFetchingNextPage &&
+    !queryResult.isPending;
+
+  return (
+    <ChangesScreenHeader
+      title={TAB_LABELS[tab]}
+      count={queryResult.loadedCount}
+      hasMore={queryResult.hasNextPage ?? false}
+      lastUpdatedAt={queryResult.freshness.lastUpdatedAt}
+      source={queryResult.freshness.source}
+      isUpdating={isUpdating || queryResult.isShowingPlaceholder}
+    />
+  );
+}
 
 export default function ChangesScreenHeader({
   title,

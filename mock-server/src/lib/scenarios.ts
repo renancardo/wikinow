@@ -3,6 +3,8 @@ import { closeAllSseClients } from './sse-clients.js';
 export type ScenarioName =
   | 'normal'
   | 'steady'
+  | 'steady-5'
+  | 'steady-10'
   | 'burst'
   | 'error-500'
   | 'drop'
@@ -19,6 +21,7 @@ export type ScenarioState = {
   sseMode: 'idle' | 'steady' | 'burst' | 'duplicate' | 'canary';
   sseDropAfterEvents: number | null;
   sseBurstCount: number;
+  sseSteadyIntervalMs: number;
 };
 
 const DEFAULT_STATE: ScenarioState = {
@@ -30,6 +33,7 @@ const DEFAULT_STATE: ScenarioState = {
   sseMode: 'idle',
   sseDropAfterEvents: null,
   sseBurstCount: 10,
+  sseSteadyIntervalMs: 1000,
 };
 
 let state: ScenarioState = { ...DEFAULT_STATE };
@@ -59,6 +63,24 @@ export function applyScenario(name: ScenarioName): ScenarioState {
         name,
         label: '1/sec steady',
         sseMode: 'steady',
+      };
+      break;
+    case 'steady-5':
+      state = {
+        ...DEFAULT_STATE,
+        name,
+        label: '5/sec steady',
+        sseMode: 'steady',
+        sseSteadyIntervalMs: 200,
+      };
+      break;
+    case 'steady-10':
+      state = {
+        ...DEFAULT_STATE,
+        name,
+        label: '10/sec steady',
+        sseMode: 'steady',
+        sseSteadyIntervalMs: 100,
       };
       break;
     case 'burst':
@@ -136,6 +158,16 @@ export const SCENARIO_OPTIONS: Array<{ name: ScenarioName; label: string; descri
   [
     { name: 'normal', label: 'Normal', description: 'Default paginated REST and idle SSE.' },
     { name: 'steady', label: '1/sec steady', description: 'Emit one enwiki SSE event per second.' },
+    {
+      name: 'steady-5',
+      label: '5/sec steady',
+      description: 'Emit five enwiki SSE events per second.',
+    },
+    {
+      name: 'steady-10',
+      label: '10/sec steady',
+      description: 'Emit ten enwiki SSE events per second.',
+    },
     { name: 'burst', label: 'Burst', description: 'Emit 10 SSE events immediately on connect.' },
     { name: 'error-500', label: '500 error', description: 'Next 3 REST requests return HTTP 500.' },
     { name: 'drop', label: 'Drop connection', description: 'Close SSE after 3 events.' },

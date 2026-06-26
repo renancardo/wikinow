@@ -34,6 +34,7 @@ export default function ChangesList({ tab, queryResult, emptyMessage }: ChangesL
   const listRef = useRef<FlashListRef<RecentChange>>(null);
   const scrollOffsetRef = useRef(0);
   const prevHeadRcidRef = useRef<number | null>(null);
+  const wasLiveEnabledRef = useRef(false);
 
   const {
     changes,
@@ -54,6 +55,14 @@ export default function ChangesList({ tab, queryResult, emptyMessage }: ChangesL
   const headRcid = changes[0]?.rcid ?? null;
 
   useEffect(() => {
+    if (wasLiveEnabledRef.current && !isLiveEnabled) {
+      requestAnimationFrame(() => {
+        listRef.current?.scrollToOffset({ offset: 0, animated: false });
+      });
+    }
+
+    wasLiveEnabledRef.current = isLiveEnabled;
+
     if (!isLiveEnabled) {
       prevHeadRcidRef.current = null;
       return;
@@ -61,7 +70,7 @@ export default function ChangesList({ tab, queryResult, emptyMessage }: ChangesL
 
     listRef.current?.scrollToOffset({ offset: 0, animated: false });
     prevHeadRcidRef.current = headRcid;
-  }, [isLiveEnabled]);
+  }, [isLiveEnabled, headRcid]);
 
   useEffect(() => {
     if (!isLiveEnabled || headRcid === null) {
@@ -166,9 +175,9 @@ export default function ChangesList({ tab, queryResult, emptyMessage }: ChangesL
         onScroll={handleScroll}
         scrollEventThrottle={16}
         maintainVisibleContentPosition={
-          isLiveEnabled || hasCachedData
+          isLiveEnabled
             ? {
-                autoscrollToTopThreshold: isLiveEnabled ? LIVE_PIN_THRESHOLD : 20,
+                autoscrollToTopThreshold: LIVE_PIN_THRESHOLD,
               }
             : undefined
         }

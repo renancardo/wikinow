@@ -102,6 +102,7 @@ SSE lines parsed via [`lib/live/transport/sse-parser.ts`](../mobile-app/lib/live
 | Toggle ON | Open `streamedQuery`; REST `refetchInterval: false` |
 | Toggle OFF | `cancelQueries` + `removeQueries` on live key; abort XHR |
 | App background | Turn **off** live toggle; close stream; REST polling resumes |
+| Stream error / disconnect | Turn **off** live toggle; commit buffer to REST cache; REST polling resumes |
 | Offline | Stream closed; Live toggle disabled |
 | Tab switch | Same global stream; per-tab filter on merge |
 

@@ -49,6 +49,7 @@ export function LiveModeProvider({ children }: { children: ReactNode }) {
     enabled: streamActive,
     staleTime: Infinity,
     gcTime: 0,
+    retry: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   });
@@ -67,9 +68,21 @@ export function LiveModeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!isFocused && isLiveEnabled) {
       liveLog('turning off live mode on background');
+      commitStreamBufferToRestCache(queryClient);
       setLiveEnabled(false);
     }
-  }, [isFocused, isLiveEnabled]);
+  }, [isFocused, isLiveEnabled, queryClient]);
+
+  useEffect(() => {
+    if (streamActive && streamQuery.isError) {
+      liveLog('turning off live mode on stream error', {
+        error:
+          streamQuery.error instanceof Error ? streamQuery.error.message : streamQuery.error,
+      });
+      commitStreamBufferToRestCache(queryClient);
+      setLiveEnabled(false);
+    }
+  }, [streamActive, streamQuery.isError, streamQuery.error, queryClient]);
 
   useEffect(() => {
     if (!streamActive) {

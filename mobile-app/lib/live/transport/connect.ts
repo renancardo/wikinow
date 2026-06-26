@@ -60,7 +60,14 @@ async function* connectViaFetch(
     while (isActive()) {
       const { done, value } = await reader.read();
 
-      if (done || !isActive()) {
+      if (done) {
+        if (isActive()) {
+          throw new Error('Stream connection closed');
+        }
+        break;
+      }
+
+      if (!isActive()) {
         break;
       }
 
@@ -239,6 +246,9 @@ async function* connectViaXhr(
       }
 
       if (streamDone) {
+        if (isActive() && !streamError) {
+          throw new Error('Stream connection closed');
+        }
         break;
       }
 

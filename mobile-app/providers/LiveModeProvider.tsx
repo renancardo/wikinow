@@ -1,5 +1,6 @@
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { useAppFocused } from '@/hooks/useAppFocused';
+import { commitStreamBufferToRestCache } from '@/lib/recent-changes/commit-stream-to-rest-cache';
 import { LIVE_QUERY_KEY, liveStreamQueryFn } from '@/lib/live/stream-query';
 import { liveLog } from '@/lib/live/log';
 import type { RecentChange } from '@/types/recent-change';
@@ -29,6 +30,7 @@ type LiveModeContextValue = {
 const LiveModeContext = createContext<LiveModeContextValue | null>(null);
 
 function stopLiveStream(queryClient: ReturnType<typeof useQueryClient>) {
+  commitStreamBufferToRestCache(queryClient);
   liveLog('stopping live stream');
   queryClient.cancelQueries({ queryKey: LIVE_QUERY_KEY });
   queryClient.removeQueries({ queryKey: LIVE_QUERY_KEY });

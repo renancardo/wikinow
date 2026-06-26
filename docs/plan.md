@@ -4,7 +4,7 @@ overview: Build an Expo React Native app showing live Wikimedia recent changes (
 todos:
   - id: scaffold
     content: Scaffold Expo app (Expo Router, TS), add TanStack Query provider + persistence, env config (EXPO_PUBLIC_*), and repo layout (mobile-app/, mock-server/)
-    status: in_progress
+    status: completed
   - id: data-layer
     content: Build typed recentchanges fetcher (User-Agent), useInfiniteQuery per tab with rccontinue cursor pagination + foreground refetchInterval
     status: pending
@@ -16,7 +16,7 @@ todos:
     status: in_progress
   - id: lifecycle
     content: Wire focusManager to AppState and onlineManager to NetInfo for background/foreground/connectivity handling
-    status: pending
+    status: completed
   - id: smooth-refresh
     content: Distinguish isLoading vs isFetching, keepPreviousData on tab/page change, stable keyExtractor to avoid flicker/blank
     status: pending
@@ -50,17 +50,18 @@ Full rationale lives in [architecture.md](./architecture.md). This is the build 
 
 ### Summary
 
-The **UI shell and navigation** are in place with **dummy data**. The **detail WebView** is feature-complete for this phase. **No real API integration yet** — TanStack Query, persistence, lifecycle managers, and the mock server are still ahead.
+The **UI shell and navigation** are in place with **dummy data**. **Scaffold is complete** — TanStack Query, persistence, env config, and lifecycle managers are wired. **No real API integration yet**.
 
 | Area | Status |
 |------|--------|
 | Expo app scaffold | Done |
-| Dependencies installed | Done (not all wired) |
+| TanStack Query + persistence | Done |
+| Env config (`EXPO_PUBLIC_*`) | Done |
+| Lifecycle managers (focus/online) | Done |
 | Tab screens + FlashList (dummy) | Done |
 | Detail WebView | Done |
-| TanStack Query provider | Not started |
-| Wikimedia API / mock server | Not started |
-| Offline / lifecycle / live mode | Not started |
+| Wikimedia API / mock server impl | Not started |
+| Offline banner / live mode | Not started |
 | README / AI_USAGE.md | Not started |
 
 ### What exists today (`v1/mobile-app/`)
@@ -83,21 +84,27 @@ The **UI shell and navigation** are in place with **dummy data**. The **detail W
   - `setSupportMultipleWindows={false}` so in-page links build history
   - iOS `allowsBackForwardNavigationGestures`
 
-**Packages installed** (in `package.json`, not yet integrated in code):
-- `@tanstack/react-query`, `@tanstack/react-query-persist-client`
+**Scaffold / data layer foundation**
+- [`providers/QueryProvider.tsx`](../mobile-app/providers/QueryProvider.tsx) — `PersistQueryClientProvider` + devtools
+- [`lib/query-client.ts`](../mobile-app/lib/query-client.ts) — shared `QueryClient` defaults
+- [`lib/async-storage-persister.ts`](../mobile-app/lib/async-storage-persister.ts) — cache persistence
+- [`lib/setup-query-managers.ts`](../mobile-app/lib/setup-query-managers.ts) — `focusManager` + `onlineManager`
+- [`constants/env.ts`](../mobile-app/constants/env.ts) — typed `env.apiBaseUrl`, `env.streamBaseUrl`, `env.userAgent`
+- [`app.config.ts`](../mobile-app/app.config.ts) + [`.env.example`](../mobile-app/.env.example) — `EXPO_PUBLIC_*` vars
+- [`mock-server/`](../mock-server/) — empty placeholder (`.gitkeep`)
+
+**Packages installed and wired:**
+- `@tanstack/react-query`, `@tanstack/react-query-persist-client`, `@tanstack/query-async-storage-persister`
 - `@react-native-async-storage/async-storage`, `@react-native-community/netinfo`
 - `@shopify/flash-list`, `react-native-webview`
 - `@dev-plugins/react-query` (dev)
 
 ### Not started yet
 
-- `QueryClientProvider` / `PersistQueryClientProvider` in root layout
-- `EXPO_PUBLIC_*` env + `app.config.ts` `extra`
 - `recentchanges` fetcher + `useInfiniteQuery` / `useRecentChanges` hook
 - `mergeChanges` dedupe util + tests
-- List: loading, error, offline, pull-to-refresh, freshness indicator
-- `focusManager` + `onlineManager` wiring
-- `mock-server/` directory
+- List: loading, error, offline banner, pull-to-refresh, freshness indicator
+- Mock server implementation (REST + SSE + scenario panel)
 - SSE live mode toggle
 - Project README + AI_USAGE.md
 
@@ -125,8 +132,11 @@ v1/
 │   │   └── detail.tsx       ← WebView
 │   ├── components/
 │   ├── data/                ← dummy-changes.ts (temporary)
+│   ├── constants/           ← env.ts
+│   ├── lib/                 ← query-client, persister, managers
+│   ├── providers/           ← QueryProvider
 │   └── types/
-└── mock-server/             ← not created yet
+└── mock-server/             ← empty placeholder (.gitkeep)
 ```
 
 ---
@@ -160,9 +170,11 @@ v1/
 
 ---
 
-## Env config (planned)
+## Env config
 
-- `EXPO_PUBLIC_*` in `.env` for API base URL; `app.config.ts` `extra` + `expo-constants` for structured config. No secrets bundled.
+- [x] `EXPO_PUBLIC_*` in `.env` / `.env.example`
+- [x] `app.config.ts` `extra` + [`constants/env.ts`](../mobile-app/constants/env.ts)
+- Default API: `https://en.wikipedia.org` — override to mock server when ready
 
 ---
 
@@ -176,11 +188,11 @@ v1/
 
 ## Build order (cut bottom-up if time runs short)
 
-1. ~~App scaffold~~ → **next:** TanStack provider + env config
-2. List screen with real API — one tab end-to-end (polling + infinite scroll + states)
+1. ~~App scaffold~~ ✅
+2. List screen with real API — one tab end-to-end (polling + infinite scroll + states) ← **next**
 3. Remaining tabs + freshness indicator + smooth-refresh polish
 4. ~~Detail WebView~~ ✅
-5. Offline persistence + banner; merge/dedupe util + tests
+5. Offline banner; merge/dedupe util + tests (persistence already wired)
 6. Mock server + scenario panel
 7. SSE Live mode toggle
 8. README + AI_USAGE.md
@@ -189,7 +201,7 @@ v1/
 
 ## Next up (recommended)
 
-1. Wire `QueryClientProvider` in `app/_layout.tsx`
-2. Add `.env` + `EXPO_PUBLIC_API_BASE_URL` (point at mock server once it exists)
-3. Replace `dummy-changes.ts` usage with `useInfiniteQuery` + Wikimedia fetcher (All tab first)
-4. Scaffold `mock-server/` so API work is testable offline
+1. Build `recentchanges` fetcher using `env.apiBaseUrl` + `env.userAgent`
+2. Replace `dummy-changes.ts` with `useInfiniteQuery` (All tab first)
+3. Implement mock server in `mock-server/`
+4. Add offline banner + list loading/error states

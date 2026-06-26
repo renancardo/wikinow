@@ -40,7 +40,7 @@ isProject: false
 
 # WikiNow — Implementation Plan
 
-Full rationale lives in [architecture.md](./architecture.md). This is the build plan and **current status tracker**.
+Full rationale lives in [architecture.md](./architecture.md). Cache details in [cache-behavior.md](./cache-behavior.md). This is the build plan and **current status tracker**.
 
 **Last updated:** 2026-06-26
 
@@ -86,6 +86,8 @@ The app is **feature-complete for the core flow**: three filtered tabs with live
 - [`hooks/useRelativeTime.ts`](../mobile-app/hooks/useRelativeTime.ts) + [`lib/format-relative-time.ts`](../mobile-app/lib/format-relative-time.ts)
 - [`lib/recent-changes.ts`](../mobile-app/lib/recent-changes.ts) — API mapping + basic page flatten/dedupe by `rcid`
 
+> **Cache model:** per tab query → pages (one per API request), not per item. See [cache-behavior.md](./cache-behavior.md).
+
 **Detail screen**
 - [`app/detail.tsx`](../mobile-app/app/detail.tsx) — WebView, loading/error/retry, WebView-first back (hardware + header/swipe)
 
@@ -101,9 +103,9 @@ The app is **feature-complete for the core flow**: three filtered tabs with live
 
 | Setting | Location | Value |
 |---------|----------|-------|
-| Poll interval | `hooks/useRecentChanges.ts` → `REFETCH_INTERVAL_MS` | 20s |
+| Poll interval | `hooks/useRecentChanges.ts` → `REFETCH_INTERVAL_MS` | 90s |
 | Background polling | `refetchIntervalInBackground` | `false` |
-| Stale time | `lib/query-client.ts` | 30s |
+| Stale time | `lib/query-client.ts` | 90s |
 | Refetch on focus / reconnect | `lib/query-client.ts` | enabled |
 
 ### Not started yet
@@ -133,6 +135,7 @@ The app is **feature-complete for the core flow**: three filtered tabs with live
 v1/
 ├── docs/
 │   ├── architecture.md
+│   ├── cache-behavior.md    ← TanStack Query cache model
 │   └── plan.md              ← this file
 ├── mobile-app/              ← Expo app (WikiNow)
 │   ├── app/
@@ -208,6 +211,16 @@ v1/
 7. Mock server + scenario panel
 8. SSE Live mode toggle
 9. README + AI_USAGE.md
+
+---
+
+## Related docs
+
+| Doc | Contents |
+|-----|----------|
+| [architecture.md](./architecture.md) | REST vs SSE strategy, eval criteria, stack decisions |
+| [cache-behavior.md](./cache-behavior.md) | How TanStack Query caches per tab/page, timing, persistence, “changes loaded” semantics |
+| [plan.md](./plan.md) | This file — status tracker and build order |
 
 ---
 

@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 
 import ChangeListItem from '@/components/ChangeListItem';
+import ChangesListHeader from '@/components/ChangesListHeader';
 import { Text, View } from '@/components/Themed';
 import { TAB_EMPTY_MESSAGES, type ChangesTab } from '@/constants/tabs';
 import Colors from '@/constants/Colors';
@@ -26,6 +27,8 @@ export default function ChangesList({ tab, emptyMessage }: ChangesListProps) {
 
   const {
     changes,
+    loadedCount,
+    freshness,
     isLoading,
     isError,
     error,
@@ -35,6 +38,8 @@ export default function ChangesList({ tab, emptyMessage }: ChangesListProps) {
     hasNextPage,
     isFetchingNextPage,
   } = useRecentChanges(tab);
+
+  const isUpdating = isFetching && !isFetchingNextPage;
 
   const handlePress = (item: (typeof changes)[number]) => {
     router.push({
@@ -55,7 +60,6 @@ export default function ChangesList({ tab, emptyMessage }: ChangesListProps) {
   }
 
   if (isError) {
-    console.error(error);
     return (
       <View style={styles.centered}>
         <Text style={styles.errorTitle}>Could not load changes</Text>
@@ -82,18 +86,21 @@ export default function ChangesList({ tab, emptyMessage }: ChangesListProps) {
 
   return (
     <View style={styles.container}>
-      {isFetching && !isFetchingNextPage ? (
-        <View style={styles.refreshBar}>
-          <ActivityIndicator size="small" color={tint} />
-          <Text style={styles.refreshText}>Updating…</Text>
-        </View>
-      ) : null}
       <FlashList
         data={changes}
         keyExtractor={(item) => String(item.rcid)}
+        ListHeaderComponent={
+          <ChangesListHeader
+            count={loadedCount}
+            hasMore={hasNextPage ?? false}
+            lastUpdatedAt={freshness.lastUpdatedAt}
+            source={freshness.source}
+            isUpdating={isUpdating}
+          />
+        }
         renderItem={({ item }) => <ChangeListItem item={item} onPress={handlePress} />}
         refreshControl={
-          <RefreshControl refreshing={isFetching && !isFetchingNextPage} onRefresh={refetch} tintColor={tint} />
+          <RefreshControl refreshing={isUpdating} onRefresh={refetch} tintColor={tint} />
         }
         onEndReached={() => {
           if (hasNextPage && !isFetchingNextPage) {
@@ -147,17 +154,6 @@ const styles = StyleSheet.create({
   },
   retryText: {
     fontWeight: '600',
-  },
-  refreshBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    paddingVertical: 8,
-  },
-  refreshText: {
-    fontSize: 13,
-    opacity: 0.6,
   },
   footer: {
     paddingVertical: 16,

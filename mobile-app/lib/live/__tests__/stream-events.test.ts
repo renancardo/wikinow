@@ -1,4 +1,4 @@
-import { isGlobalStreamEvent } from '@/lib/live/filter-stream-event';
+import { isGlobalStreamEvent, mapStreamEvent } from '@/lib/live/stream-events';
 import type { StreamRecentChangeEvent } from '@/types/stream-recent-change';
 
 function streamEvent(
@@ -29,5 +29,27 @@ describe('isGlobalStreamEvent', () => {
 
   it('rejects non-enwiki events', () => {
     expect(isGlobalStreamEvent(streamEvent({ wiki: 'wikidatawiki' }))).toBe(false);
+  });
+});
+
+describe('mapStreamEvent', () => {
+  it('maps stream fields to RecentChange', () => {
+    const mapped = mapStreamEvent(streamEvent());
+
+    expect(mapped).toEqual({
+      rcid: 42,
+      title: 'Test Page',
+      user: 'TestUser',
+      type: 'edit',
+      namespace: 0,
+      timestamp: new Date(1_700_000_000 * 1000).toISOString(),
+      pageUrl: 'https://en.wikipedia.org/wiki/Test_Page',
+    });
+  });
+
+  it('maps categorize events to log type', () => {
+    const mapped = mapStreamEvent(streamEvent({ type: 'categorize' }));
+
+    expect(mapped.type).toBe('log');
   });
 });

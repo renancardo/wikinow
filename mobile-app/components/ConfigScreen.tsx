@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 
 import { Text, View } from '@/components/Themed';
-import { useColorScheme } from '@/components/useColorScheme';
+import { useColorScheme } from '@/hooks/useColorScheme';
 import Colors from '@/constants/Colors';
 import type {
   AppConfigFieldMeta,

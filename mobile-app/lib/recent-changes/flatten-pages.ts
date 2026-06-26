@@ -4,7 +4,7 @@ import type { RecentChangesPage } from '@/types/wiki-recent-change';
 
 export function flattenRecentChangesPages(pages: RecentChangesPage[]): RecentChange[] {
   return pages.reduce(
-    (accumulated, page) => mergeChanges(accumulated, page.changes, 'append'),
+    (accumulated, page) => mergeChanges(accumulated, page.changes),
     [] as RecentChange[],
   );
 }

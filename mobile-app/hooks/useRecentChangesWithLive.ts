@@ -36,7 +36,7 @@ export function useRecentChangesWithLive(tab: ChangesTab) {
 
   const mergedChanges =
     tabStreamChanges.length > 0
-      ? mergeChanges(queryResult.changes, tabStreamChanges, 'prepend')
+      ? mergeChanges(queryResult.changes, tabStreamChanges)
       : queryResult.changes;
 
   const changes = capListItems(mergedChanges, config.maxListItems);

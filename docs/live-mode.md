@@ -21,9 +21,11 @@ Mirror Wikimedia's [Recent Changes "Live updates"](https://www.mediawiki.org/wik
 | Live toggle UI | [`components/LiveToggle.tsx`](../mobile-app/components/LiveToggle.tsx) — tab header (`headerRight` on list tabs) |
 | Global live state + stream query | [`providers/LiveModeProvider.tsx`](../mobile-app/providers/LiveModeProvider.tsx) |
 | REST + stream merge | [`hooks/useRecentChangesWithLive.ts`](../mobile-app/hooks/useRecentChangesWithLive.ts) |
-| SSE transport | [`api/recent-change-stream.ts`](../mobile-app/api/recent-change-stream.ts) |
-| Stream → `RecentChange` | [`lib/live/map-stream-event.ts`](../mobile-app/lib/live/map-stream-event.ts) |
-| Stream client filters | [`lib/live/filter-stream-event.ts`](../mobile-app/lib/live/filter-stream-event.ts) — canary + enwiki |
+| SSE transport | [`lib/live/transport/connect.ts`](../mobile-app/lib/live/transport/connect.ts) — fetch (web) / XHR (native); [`api/recent-change-stream.ts`](../mobile-app/api/recent-change-stream.ts) re-exports |
+| SSE parsing | [`lib/live/transport/sse-parser.ts`](../mobile-app/lib/live/transport/sse-parser.ts) |
+| Stream → `RecentChange` | [`lib/live/stream-events.ts`](../mobile-app/lib/live/stream-events.ts) — `mapStreamEvent` |
+| Stream client filters | [`lib/live/stream-events.ts`](../mobile-app/lib/live/stream-events.ts) — `isGlobalStreamEvent` (canary + enwiki) |
+| Stream query + reducer | [`lib/live/stream-query.ts`](../mobile-app/lib/live/stream-query.ts) |
 | Tab filter on merge | [`lib/recent-changes/matches-tab-filter.ts`](../mobile-app/lib/recent-changes/matches-tab-filter.ts) |
 | List pin-to-top when live | [`components/ChangesList.tsx`](../mobile-app/components/ChangesList.tsx) |
 | Debug logs | [`lib/live/log.ts`](../mobile-app/lib/live/log.ts) — gated by `liveLogEnabled` config |
@@ -89,7 +91,7 @@ React Native `fetch()` does **not** stream SSE responses (hangs until connection
 | Web | `fetch` + `ReadableStream` |
 | iOS / Android | `XMLHttpRequest` + `onprogress` |
 
-SSE lines parsed via [`lib/live/parse-sse-buffer.ts`](../mobile-app/lib/live/parse-sse-buffer.ts).
+SSE lines parsed via [`lib/live/transport/sse-parser.ts`](../mobile-app/lib/live/transport/sse-parser.ts).
 
 ---
 

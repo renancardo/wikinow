@@ -6,7 +6,7 @@ import type { WebViewNavigation } from 'react-native-webview';
 
 import { Text, View } from '@/components/Themed';
 import Colors from '@/constants/Colors';
-import { useColorScheme } from '@/components/useColorScheme';
+import { useColorScheme } from '@/hooks/useColorScheme';
 
 export default function DetailScreen() {
   const { url, title } = useLocalSearchParams<{ url: string; title: string }>();

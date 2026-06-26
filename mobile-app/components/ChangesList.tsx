@@ -16,7 +16,7 @@ import OfflineBanner from '@/components/OfflineBanner';
 import { Text, View } from '@/components/Themed';
 import { TAB_EMPTY_MESSAGES, type ChangesTab } from '@/constants/tabs';
 import Colors from '@/constants/Colors';
-import { useColorScheme } from '@/components/useColorScheme';
+import { useColorScheme } from '@/hooks/useColorScheme';
 import { useRecentChangesWithLive } from '@/hooks/useRecentChangesWithLive';
 import type { RecentChange } from '@/types/recent-change';
 

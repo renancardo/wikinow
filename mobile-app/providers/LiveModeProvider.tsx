@@ -1,13 +1,9 @@
-import { connectRecentChangeStream } from '@/api/recent-change-stream';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { useAppFocused } from '@/hooks/useAppFocused';
-import { getAppConfig } from '@/lib/config/app-config-store';
-import { isGlobalStreamEvent } from '@/lib/live/filter-stream-event';
+import { LIVE_QUERY_KEY, liveStreamQueryFn } from '@/lib/live/stream-query';
 import { liveLog } from '@/lib/live/log';
-import { mapStreamEvent } from '@/lib/live/map-stream-event';
-import { mergeChanges } from '@/lib/recent-changes/merge-changes';
 import type { RecentChange } from '@/types/recent-change';
-import { experimental_streamedQuery, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   createContext,
   useCallback,
@@ -17,8 +13,6 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-
-const LIVE_QUERY_KEY = ['recentchanges-live'] as const;
 
 type LiveModeContextValue = {
   isLiveEnabled: boolean;
@@ -33,32 +27,6 @@ type LiveModeContextValue = {
 };
 
 const LiveModeContext = createContext<LiveModeContextValue | null>(null);
-
-const liveStreamQueryFn = experimental_streamedQuery({
-  streamFn: ({ signal }) => connectRecentChangeStream(signal),
-  reducer: (acc: RecentChange[], chunk) => {
-    if (!isGlobalStreamEvent(chunk)) {
-      return acc;
-    }
-
-    const mapped = mapStreamEvent(chunk);
-    const merged = mergeChanges(acc, [mapped], 'prepend');
-    const streamBufferMax = getAppConfig().streamBufferMax;
-
-    liveLog('accepted enwiki event', {
-      rcid: mapped.rcid,
-      title: mapped.title,
-      bufferSize: merged.length,
-    });
-
-    if (merged.length <= streamBufferMax) {
-      return merged;
-    }
-
-    return merged.slice(0, streamBufferMax);
-  },
-  initialValue: [] as RecentChange[],
-});
 
 function stopLiveStream(queryClient: ReturnType<typeof useQueryClient>) {
   liveLog('stopping live stream');

@@ -2,6 +2,18 @@ import { EXTERNAL_CHANGE_TYPES } from '@/lib/utils/change-type';
 import type { RecentChange } from '@/types/recent-change';
 import type { StreamRecentChangeEvent } from '@/types/stream-recent-change';
 
+export function isGlobalStreamEvent(event: StreamRecentChangeEvent): boolean {
+  if (event.meta?.domain === 'canary') {
+    return false;
+  }
+
+  if (event.wiki !== 'enwiki') {
+    return false;
+  }
+
+  return true;
+}
+
 export function mapStreamEvent(event: StreamRecentChangeEvent): RecentChange {
   return {
     rcid: event.id,

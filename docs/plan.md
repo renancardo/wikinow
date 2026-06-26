@@ -95,7 +95,9 @@ The **mobile app is feature-complete** for the take-home core: three filtered ta
 **Live mode**
 - [`providers/LiveModeProvider.tsx`](../mobile-app/providers/LiveModeProvider.tsx) — global state + `experimental_streamedQuery`
 - [`api/recent-change-stream.ts`](../mobile-app/api/recent-change-stream.ts) — SSE via `fetch`+`ReadableStream` (web) or `XMLHttpRequest` (native)
-- [`lib/live/map-stream-event.ts`](../mobile-app/lib/live/map-stream-event.ts), [`lib/live/filter-stream-event.ts`](../mobile-app/lib/live/filter-stream-event.ts)
+- [`lib/live/stream-events.ts`](../mobile-app/lib/live/stream-events.ts) — filter + map
+- [`lib/live/transport/connect.ts`](../mobile-app/lib/live/transport/connect.ts), [`lib/live/transport/sse-parser.ts`](../mobile-app/lib/live/transport/sse-parser.ts)
+- [`lib/live/stream-query.ts`](../mobile-app/lib/live/stream-query.ts)
 - [`lib/recent-changes/matches-tab-filter.ts`](../mobile-app/lib/recent-changes/matches-tab-filter.ts) — tab filter applied on merge
 - [`components/LiveToggle.tsx`](../mobile-app/components/LiveToggle.tsx)
 
@@ -114,7 +116,7 @@ The **mobile app is feature-complete** for the take-home core: three filtered ta
 - [`lib/query/setup-query-managers.ts`](../mobile-app/lib/query/setup-query-managers.ts) — `focusManager` (initial `AppState`) + `onlineManager`
 - [`constants/env.ts`](../mobile-app/constants/env.ts), [`components/useColorScheme.ts`](../mobile-app/components/useColorScheme.ts) — theme from config or system
 
-**Tests** (colocated under `lib/`) — `recent-changes/merge-changes`, `recent-changes/flatten-pages`, `recent-changes/matches-tab-filter`, `live/map-stream-event`, `live/filter-stream-event`, `live/parse-sse-buffer`, `config/app-config`
+**Tests** (colocated under `lib/`) — `recent-changes/merge-changes`, `recent-changes/flatten-pages`, `recent-changes/matches-tab-filter`, `live/stream-events`, `live/transport/sse-parser`, `config/app-config`
 
 > **Cache model:** per tab query → pages (one per API request), not per item. Live stream is a separate query merged at display time. See [cache-behavior.md](./cache-behavior.md).
 
@@ -174,7 +176,7 @@ v1/
 │   │   ├── config/          ← app-config-store
 │   │   ├── query/           ← query-client, persistence, focus/online managers
 │   │   ├── recent-changes/  ← merge, flatten, map-wiki-change, tab filter
-│   │   ├── live/            ← SSE parse, map, filter, log
+│   │   ├── live/            ← transport/, stream-events, stream-query, log
 │   │   └── utils/           ← change-type map, format-relative-time
 │   ├── providers/           ← QueryProvider, AppConfigProvider, LiveModeProvider
 │   └── types/               ← recent-change, feed-freshness, stream-recent-change, wiki-recent-change

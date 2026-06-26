@@ -25,7 +25,7 @@ todos:
     status: completed
   - id: offline
     content: Offline banner with dataUpdatedAt relative time (cache persistence already wired)
-    status: pending
+    status: completed
   - id: mock-server
     content: "TypeScript mock server: REST + SSE endpoints + /mock scenario panel (1/sec, burst, slow, 500, drop, duplicate/out-of-order, empty)"
     status: pending
@@ -63,7 +63,7 @@ The app is **feature-complete for the core flow**: three filtered tabs with live
 | Loaded count + freshness indicator | Done |
 | Detail WebView + back behavior | Done |
 | Smooth refresh polish (`keepPreviousData`) | Partial |
-| Offline banner | Not started |
+| Offline banner | Done |
 | `mergeChanges` util + tests | Not started |
 | Mock server implementation | Not started |
 | SSE live mode | Not started |
@@ -110,7 +110,7 @@ The app is **feature-complete for the core flow**: three filtered tabs with live
 
 ### Not started yet
 
-- Offline banner ("Offline — showing data from Xm ago") using `onlineManager` + persisted cache
+- Offline banner ("Offline — showing data from Xm ago") using `onlineManager` + persisted cache — [`components/OfflineBanner.tsx`](../mobile-app/components/OfflineBanner.tsx), [`hooks/useOnlineStatus.ts`](../mobile-app/hooks/useOnlineStatus.ts)
 - Full `mergeChanges` util + unit tests (basic dedupe in `flattenRecentChangesPages` only)
 - `placeholderData: keepPreviousData` for explicit tab-switch smoothness
 - Mock server (REST + SSE + `/mock` scenario panel)
@@ -206,7 +206,7 @@ v1/
 2. ~~List screen with real API~~ ✅
 3. ~~Freshness indicator + loaded count~~ ✅
 4. ~~Detail WebView~~ ✅
-5. Offline banner; `mergeChanges` util + tests ← **next**
+5. ~~Offline banner~~ ✅; `mergeChanges` util + tests ← **next**
 6. Smooth-refresh polish (`keepPreviousData`)
 7. Mock server + scenario panel
 8. SSE Live mode toggle
@@ -226,8 +226,8 @@ v1/
 
 ## Next up (recommended)
 
-1. Offline banner wired to `onlineManager` + `freshness.lastUpdatedAt`
-2. Extract `mergeChanges` util + unit tests for head-refresh / pagination correctness
+1. Extract `mergeChanges` util + unit tests for head-refresh / pagination correctness
+2. Smooth-refresh polish (`keepPreviousData`)
 3. Implement mock server in `mock-server/`
 4. SSE live mode toggle using `mergeFeedFreshness`
 5. README + AI_USAGE.md

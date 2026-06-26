@@ -9,6 +9,7 @@ import {
 
 import ChangeListItem from '@/components/ChangeListItem';
 import ChangesListHeader from '@/components/ChangesListHeader';
+import OfflineBanner from '@/components/OfflineBanner';
 import { Text, View } from '@/components/Themed';
 import { TAB_EMPTY_MESSAGES, type ChangesTab } from '@/constants/tabs';
 import Colors from '@/constants/Colors';
@@ -29,6 +30,8 @@ export default function ChangesList({ tab, emptyMessage }: ChangesListProps) {
     changes,
     loadedCount,
     freshness,
+    isOnline,
+    hasCachedData,
     isLoading,
     isError,
     error,
@@ -39,7 +42,8 @@ export default function ChangesList({ tab, emptyMessage }: ChangesListProps) {
     isFetchingNextPage,
   } = useRecentChanges(tab);
 
-  const isUpdating = isFetching && !isFetchingNextPage;
+  const isUpdating = isOnline && isFetching && !isFetchingNextPage;
+  const isOffline = !isOnline;
 
   const handlePress = (item: (typeof changes)[number]) => {
     router.push({
@@ -51,7 +55,7 @@ export default function ChangesList({ tab, emptyMessage }: ChangesListProps) {
     });
   };
 
-  if (isLoading) {
+  if (isLoading && !hasCachedData) {
     return (
       <View style={styles.centered}>
         <ActivityIndicator size="large" color={tint} />
@@ -59,33 +63,60 @@ export default function ChangesList({ tab, emptyMessage }: ChangesListProps) {
     );
   }
 
-  if (isError) {
+  if (isOffline && !hasCachedData) {
     return (
-      <View style={styles.centered}>
-        <Text style={styles.errorTitle}>Could not load changes</Text>
-        <Text style={styles.errorMessage}>
-          {error instanceof Error ? error.message : 'Something went wrong.'}
-        </Text>
-        <Pressable style={[styles.retryButton, { backgroundColor: tint }]} onPress={() => refetch()}>
-          <Text style={styles.retryText}>Retry</Text>
-        </Pressable>
+      <View style={styles.container}>
+        <OfflineBanner lastUpdatedAt={freshness.lastUpdatedAt} />
+        <View style={styles.centered}>
+          <Text style={styles.emptyText}>
+            {emptyMessage ?? TAB_EMPTY_MESSAGES[tab]}
+          </Text>
+          <Text style={styles.offlineHint}>Connect to the internet to load recent changes.</Text>
+        </View>
+      </View>
+    );
+  }
+
+  if (isError && !hasCachedData) {
+    return (
+      <View style={styles.container}>
+        {isOffline ? <OfflineBanner lastUpdatedAt={freshness.lastUpdatedAt} /> : null}
+        <View style={styles.centered}>
+          <Text style={styles.errorTitle}>Could not load changes</Text>
+          <Text style={styles.errorMessage}>
+            {error instanceof Error ? error.message : 'Something went wrong.'}
+          </Text>
+          <Pressable
+            style={[styles.retryButton, { backgroundColor: tint }]}
+            onPress={() => refetch()}
+            disabled={isOffline}>
+            <Text style={styles.retryText}>{isOffline ? 'Offline' : 'Retry'}</Text>
+          </Pressable>
+        </View>
       </View>
     );
   }
 
   if (changes.length === 0) {
     return (
-      <View style={styles.centered}>
-        <Text style={styles.emptyText}>{emptyMessage ?? TAB_EMPTY_MESSAGES[tab]}</Text>
-        <Pressable style={[styles.retryButton, { backgroundColor: tint }]} onPress={() => refetch()}>
-          <Text style={styles.retryText}>Refresh</Text>
-        </Pressable>
+      <View style={styles.container}>
+        {isOffline ? <OfflineBanner lastUpdatedAt={freshness.lastUpdatedAt} /> : null}
+        <View style={styles.centered}>
+          <Text style={styles.emptyText}>{emptyMessage ?? TAB_EMPTY_MESSAGES[tab]}</Text>
+          <Pressable
+            style={[styles.retryButton, { backgroundColor: tint }]}
+            onPress={() => refetch()}
+            disabled={isOffline}>
+            <Text style={styles.retryText}>{isOffline ? 'Offline' : 'Refresh'}</Text>
+          </Pressable>
+        </View>
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
+      {isOffline ? <OfflineBanner lastUpdatedAt={freshness.lastUpdatedAt} /> : null}
       <FlashList
         data={changes}
         keyExtractor={(item) => String(item.rcid)}
@@ -100,10 +131,15 @@ export default function ChangesList({ tab, emptyMessage }: ChangesListProps) {
         }
         renderItem={({ item }) => <ChangeListItem item={item} onPress={handlePress} />}
         refreshControl={
-          <RefreshControl refreshing={isUpdating} onRefresh={refetch} tintColor={tint} />
+          <RefreshControl
+            refreshing={isUpdating}
+            onRefresh={refetch}
+            tintColor={tint}
+            enabled={isOnline}
+          />
         }
         onEndReached={() => {
-          if (hasNextPage && !isFetchingNextPage) {
+          if (isOnline && hasNextPage && !isFetchingNextPage) {
             fetchNextPage();
           }
         }}
@@ -134,7 +170,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     opacity: 0.6,
     textAlign: 'center',
-    marginBottom: 16,
+    marginBottom: 8,
+  },
+  offlineHint: {
+    fontSize: 14,
+    opacity: 0.5,
+    textAlign: 'center',
   },
   errorTitle: {
     fontSize: 18,
@@ -151,6 +192,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 8,
+    marginTop: 8,
   },
   retryText: {
     fontWeight: '600',

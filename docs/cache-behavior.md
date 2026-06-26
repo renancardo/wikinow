@@ -74,7 +74,7 @@ queryKey: ['recentchanges-live']
 | Tab switch | Different query key |
 | Live mode on | REST polling paused; stream prepends at display layer |
 
-Flattening: [`lib/recent-changes.ts`](../mobile-app/lib/recent-changes.ts) → `flattenRecentChangesPages()` via `mergeChanges`.
+Flattening: [`lib/recent-changes/flatten-pages.ts`](../mobile-app/lib/recent-changes/flatten-pages.ts) → `flattenRecentChangesPages()` via [`lib/recent-changes/merge-changes.ts`](../mobile-app/lib/recent-changes/merge-changes.ts).
 
 ---
 
@@ -103,7 +103,7 @@ flowchart TD
 
 ## Timing: when is cache used vs refetched?
 
-### Global defaults — [`lib/query-client.ts`](../mobile-app/lib/query-client.ts)
+### Global defaults — [`lib/query/query-client.ts`](../mobile-app/lib/query/query-client.ts)
 
 | Option | Value | Meaning |
 |--------|-------|---------|
@@ -123,7 +123,7 @@ flowchart TD
 
 Relative-time labels refresh on `config.tickMs` (default 10s) via [`hooks/useRelativeTime.ts`](../mobile-app/hooks/useRelativeTime.ts).
 
-Foreground/background: [`lib/setup-query-managers.ts`](../mobile-app/lib/setup-query-managers.ts) (`focusManager` + initial `AppState`, `onlineManager` + NetInfo).
+Foreground/background: [`lib/query/setup-query-managers.ts`](../mobile-app/lib/query/setup-query-managers.ts) (`focusManager` + initial `AppState`, `onlineManager` + NetInfo).
 
 ---
 
@@ -131,7 +131,7 @@ Foreground/background: [`lib/setup-query-managers.ts`](../mobile-app/lib/setup-q
 
 Configured in [`providers/QueryProvider.tsx`](../mobile-app/providers/QueryProvider.tsx):
 
-- **Persister:** [`lib/async-storage-persister.ts`](../mobile-app/lib/async-storage-persister.ts)
+- **Persister:** [`lib/query/async-storage-persister.ts`](../mobile-app/lib/query/async-storage-persister.ts)
 - **Storage key:** `wikinow-query-cache`
 - **maxAge:** 24 hours
 - **Excluded:** `['recentchanges-live']` (live stream buffer)
@@ -157,7 +157,7 @@ It is **not** total Wikipedia changes or a permanent local database.
 Refetch (poll, pull-to-refresh, focus, reconnect) re-executes the infinite query — typically **all loaded pages**, not just page 1.
 
 - Scrolled to 3 pages → refetch may hit the API 3 times.
-- Head of the feed shifts; [`mergeChanges`](../mobile-app/lib/merge-changes.ts) dedupes by `rcid` (incoming wins).
+- Head of the feed shifts; [`mergeChanges`](../mobile-app/lib/recent-changes/merge-changes.ts) dedupes by `rcid` (incoming wins).
 
 ---
 
@@ -206,11 +206,15 @@ Look for `['recentchanges', ...]` and `['recentchanges-live']`.
 | [`hooks/useRecentChanges.ts`](../mobile-app/hooks/useRecentChanges.ts) | REST query key, polling |
 | [`hooks/useRecentChangesWithLive.ts`](../mobile-app/hooks/useRecentChangesWithLive.ts) | Merge + list cap + freshness |
 | [`providers/LiveModeProvider.tsx`](../mobile-app/providers/LiveModeProvider.tsx) | Live stream query |
+| [`api/recent-changes.ts`](../mobile-app/api/recent-changes.ts) | REST fetcher + pagination |
+| [`lib/recent-changes/map-wiki-change.ts`](../mobile-app/lib/recent-changes/map-wiki-change.ts) | Wiki API → `RecentChange` mapping |
+| [`types/wiki-recent-change.ts`](../mobile-app/types/wiki-recent-change.ts) | Wiki API response types |
 | [`constants/app-config.ts`](../mobile-app/constants/app-config.ts) | `pageSize`, `refetchIntervalMs`, caps |
-| [`lib/query-client.ts`](../mobile-app/lib/query-client.ts) | Global stale/gc defaults |
+| [`lib/query/query-client.ts`](../mobile-app/lib/query/query-client.ts) | Global stale/gc defaults |
 | [`providers/QueryProvider.tsx`](../mobile-app/providers/QueryProvider.tsx) | Persistence + dehydrate filter |
-| [`lib/recent-changes.ts`](../mobile-app/lib/recent-changes.ts) | Page flatten + dedupe |
-| [`lib/merge-changes.ts`](../mobile-app/lib/merge-changes.ts) | Dedupe/sort for merge paths |
+| [`lib/recent-changes/flatten-pages.ts`](../mobile-app/lib/recent-changes/flatten-pages.ts) | Page flatten |
+| [`lib/recent-changes/merge-changes.ts`](../mobile-app/lib/recent-changes/merge-changes.ts) | Dedupe/sort for merge paths |
+| [`lib/recent-changes/matches-tab-filter.ts`](../mobile-app/lib/recent-changes/matches-tab-filter.ts) | Tab filter on live merge |
 
 ---
 

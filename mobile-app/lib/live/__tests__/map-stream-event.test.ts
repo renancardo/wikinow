@@ -1,4 +1,4 @@
-import { mapStreamEvent } from '@/lib/map-stream-event';
+import { mapStreamEvent } from '@/lib/live/map-stream-event';
 import type { StreamRecentChangeEvent } from '@/types/stream-recent-change';
 
 function streamEvent(

@@ -17,7 +17,7 @@ import {
   type AppConfig,
   type AppConfigFieldMeta,
 } from '@/constants/app-config';
-import { mergeRuntimeAppConfig, setRuntimeAppConfig } from '@/lib/app-config-store';
+import { mergeRuntimeAppConfig, setRuntimeAppConfig } from '@/lib/config/app-config-store';
 
 type AppConfigContextValue = {
   config: AppConfig;

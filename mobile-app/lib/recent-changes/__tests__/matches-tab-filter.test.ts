@@ -1,26 +1,5 @@
-import {
-  isGlobalStreamEvent,
-  matchesTabFilter,
-} from '@/lib/filter-stream-event';
+import { matchesTabFilter } from '@/lib/recent-changes/matches-tab-filter';
 import type { RecentChange } from '@/types/recent-change';
-import type { StreamRecentChangeEvent } from '@/types/stream-recent-change';
-
-function streamEvent(
-  overrides: Partial<StreamRecentChangeEvent> = {},
-): StreamRecentChangeEvent {
-  return {
-    meta: { domain: 'en.wikipedia.org' },
-    wiki: 'enwiki',
-    type: 'edit',
-    namespace: 0,
-    title: 'Test Page',
-    title_url: 'https://en.wikipedia.org/wiki/Test_Page',
-    user: 'TestUser',
-    timestamp: 1_700_000_000,
-    id: 42,
-    ...overrides,
-  };
-}
 
 function change(overrides: Partial<RecentChange> = {}): RecentChange {
   return {
@@ -34,20 +13,6 @@ function change(overrides: Partial<RecentChange> = {}): RecentChange {
     ...overrides,
   };
 }
-
-describe('isGlobalStreamEvent', () => {
-  it('accepts enwiki events', () => {
-    expect(isGlobalStreamEvent(streamEvent())).toBe(true);
-  });
-
-  it('rejects canary events', () => {
-    expect(isGlobalStreamEvent(streamEvent({ meta: { domain: 'canary' } }))).toBe(false);
-  });
-
-  it('rejects non-enwiki events', () => {
-    expect(isGlobalStreamEvent(streamEvent({ wiki: 'wikidatawiki' }))).toBe(false);
-  });
-});
 
 describe('matchesTabFilter', () => {
   it('matches all tab for any change', () => {

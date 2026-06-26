@@ -2,9 +2,9 @@ import { useReactQueryDevTools } from '@dev-plugins/react-query';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { type ReactNode, useEffect } from 'react';
 
-import { asyncStoragePersister } from '@/lib/async-storage-persister';
-import { queryClient } from '@/lib/query-client';
-import { setupQueryManagers } from '@/lib/setup-query-managers';
+import { asyncStoragePersister } from '@/lib/query/async-storage-persister';
+import { queryClient } from '@/lib/query/query-client';
+import { setupQueryManagers } from '@/lib/query/setup-query-managers';
 
 type QueryProviderProps = {
   children: ReactNode;

@@ -4,7 +4,7 @@ import { fetchRecentChanges } from '@/api/recent-changes';
 import { TAB_FILTERS, type ChangesTab } from '@/constants/tabs';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { useAppConfig } from '@/providers/AppConfigProvider';
-import { flattenRecentChangesPages } from '@/lib/recent-changes';
+import { flattenRecentChangesPages } from '@/lib/recent-changes/flatten-pages';
 import { createFeedFreshness } from '@/types/feed-freshness';
 
 type UseRecentChangesOptions = {

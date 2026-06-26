@@ -1,11 +1,8 @@
 import { env } from '@/constants/env';
-import { getAppConfig } from '@/lib/app-config-store';
+import { getAppConfig } from '@/lib/config/app-config-store';
+import { mapWikiChange } from '@/lib/recent-changes/map-wiki-change';
 import type { RecentChangesApiFilter } from '@/constants/tabs';
-import {
-  mapWikiChange,
-  type RecentChangesPage,
-  type WikiRecentChangesResponse,
-} from '@/lib/recent-changes';
+import type { RecentChangesPage, WikiRecentChangesResponse } from '@/types/wiki-recent-change';
 
 type FetchRecentChangesParams = {
   filter: RecentChangesApiFilter;

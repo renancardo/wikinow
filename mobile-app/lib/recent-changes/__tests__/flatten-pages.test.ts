@@ -1,6 +1,7 @@
 import type { RecentChange } from '@/types/recent-change';
 
-import { flattenRecentChangesPages, type RecentChangesPage } from '@/lib/recent-changes';
+import { flattenRecentChangesPages } from '@/lib/recent-changes/flatten-pages';
+import type { RecentChangesPage } from '@/types/wiki-recent-change';
 
 function change(rcid: number): RecentChange {
   return {

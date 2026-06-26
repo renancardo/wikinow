@@ -85,6 +85,8 @@ The **mobile app is feature-complete** for the take-home core: three filtered ta
 - [`hooks/useRecentChangesWithLive.ts`](../mobile-app/hooks/useRecentChangesWithLive.ts) — merges REST + live stream, caps list length, freshness merge
 - [`hooks/useRecentChanges.ts`](../mobile-app/hooks/useRecentChanges.ts) — `useInfiniteQuery` per tab; polling interval from config
 - [`api/recent-changes.ts`](../mobile-app/api/recent-changes.ts) — fetcher with `User-Agent`, `rccontinue` pagination (`pageSize` from config)
+- [`lib/recent-changes/map-wiki-change.ts`](../mobile-app/lib/recent-changes/map-wiki-change.ts) — Wiki REST → `RecentChange`
+- [`lib/recent-changes/merge-changes.ts`](../mobile-app/lib/recent-changes/merge-changes.ts), [`lib/recent-changes/flatten-pages.ts`](../mobile-app/lib/recent-changes/flatten-pages.ts)
 - [`constants/tabs.ts`](../mobile-app/constants/tabs.ts) — All, Articles (`rcnamespace=0`), New pages (`rctype=new`)
 - [`components/ChangesList.tsx`](../mobile-app/components/ChangesList.tsx) — FlashList, live pin-to-top, `maintainVisibleContentPosition`
 - [`components/ChangesListHeader.tsx`](../mobile-app/components/ChangesListHeader.tsx) — loaded count + freshness (`api` / `stream` / `cache`)
@@ -93,25 +95,26 @@ The **mobile app is feature-complete** for the take-home core: three filtered ta
 **Live mode**
 - [`providers/LiveModeProvider.tsx`](../mobile-app/providers/LiveModeProvider.tsx) — global state + `experimental_streamedQuery`
 - [`api/recent-change-stream.ts`](../mobile-app/api/recent-change-stream.ts) — SSE via `fetch`+`ReadableStream` (web) or `XMLHttpRequest` (native)
-- [`lib/map-stream-event.ts`](../mobile-app/lib/map-stream-event.ts), [`lib/filter-stream-event.ts`](../mobile-app/lib/filter-stream-event.ts)
+- [`lib/live/map-stream-event.ts`](../mobile-app/lib/live/map-stream-event.ts), [`lib/live/filter-stream-event.ts`](../mobile-app/lib/live/filter-stream-event.ts)
+- [`lib/recent-changes/matches-tab-filter.ts`](../mobile-app/lib/recent-changes/matches-tab-filter.ts) — tab filter applied on merge
 - [`components/LiveToggle.tsx`](../mobile-app/components/LiveToggle.tsx)
 
 **Config**
 - [`app/(tabs)/settings.tsx`](../mobile-app/app/(tabs)/settings.tsx) → [`components/ConfigScreen.tsx`](../mobile-app/components/ConfigScreen.tsx)
 - [`constants/app-config.ts`](../mobile-app/constants/app-config.ts) — defaults + field metadata
 - [`providers/AppConfigProvider.tsx`](../mobile-app/providers/AppConfigProvider.tsx) — AsyncStorage persistence
-- [`lib/app-config-store.ts`](../mobile-app/lib/app-config-store.ts) — runtime snapshot for non-React code (API, logs, stream reducer)
+- [`lib/config/app-config-store.ts`](../mobile-app/lib/config/app-config-store.ts) — runtime snapshot for non-React code (API, logs, stream reducer)
 
 **Detail screen**
 - [`app/detail.tsx`](../mobile-app/app/detail.tsx) — WebView, loading/error/retry, WebView-first back
 
 **Infrastructure**
 - [`providers/QueryProvider.tsx`](../mobile-app/providers/QueryProvider.tsx) — persistence; live stream query excluded from dehydrate
-- [`lib/query-client.ts`](../mobile-app/lib/query-client.ts), [`lib/async-storage-persister.ts`](../mobile-app/lib/async-storage-persister.ts)
-- [`lib/setup-query-managers.ts`](../mobile-app/lib/setup-query-managers.ts) — `focusManager` (initial `AppState`) + `onlineManager`
+- [`lib/query/query-client.ts`](../mobile-app/lib/query/query-client.ts), [`lib/query/async-storage-persister.ts`](../mobile-app/lib/query/async-storage-persister.ts)
+- [`lib/query/setup-query-managers.ts`](../mobile-app/lib/query/setup-query-managers.ts) — `focusManager` (initial `AppState`) + `onlineManager`
 - [`constants/env.ts`](../mobile-app/constants/env.ts), [`components/useColorScheme.ts`](../mobile-app/components/useColorScheme.ts) — theme from config or system
 
-**Tests** (`lib/__tests__/`) — `merge-changes`, `recent-changes`, `map-stream-event`, `filter-stream-event`, `parse-sse-buffer`, `app-config`
+**Tests** (colocated under `lib/`) — `recent-changes/merge-changes`, `recent-changes/flatten-pages`, `recent-changes/matches-tab-filter`, `live/map-stream-event`, `live/filter-stream-event`, `live/parse-sse-buffer`, `config/app-config`
 
 > **Cache model:** per tab query → pages (one per API request), not per item. Live stream is a separate query merged at display time. See [cache-behavior.md](./cache-behavior.md).
 
@@ -129,7 +132,7 @@ Defaults in [`constants/app-config.ts`](../mobile-app/constants/app-config.ts). 
 | `liveLogEnabled` | `true` in `__DEV__` | `[WikiNow:Live]` console logs |
 | `maxListItems` | 200 | Max rows in combined FlashList |
 
-Global TanStack defaults (`staleTime` 90s, `gcTime` 24h) remain in [`lib/query-client.ts`](../mobile-app/lib/query-client.ts).
+Global TanStack defaults (`staleTime` 90s, `gcTime` 24h) remain in [`lib/query/query-client.ts`](../mobile-app/lib/query/query-client.ts).
 
 ### Not started yet
 
@@ -167,9 +170,14 @@ v1/
 │   ├── components/          ← ChangesList, LiveToggle, ConfigScreen, …
 │   ├── constants/           ← env.ts, tabs.ts, app-config.ts, Colors.ts
 │   ├── hooks/               ← useRecentChanges, useRecentChangesWithLive, …
-│   ├── lib/                 ← merge, stream map/filter, parse-sse-buffer, …
+│   ├── lib/
+│   │   ├── config/          ← app-config-store
+│   │   ├── query/           ← query-client, persistence, focus/online managers
+│   │   ├── recent-changes/  ← merge, flatten, map-wiki-change, tab filter
+│   │   ├── live/            ← SSE parse, map, filter, log
+│   │   └── utils/           ← change-type map, format-relative-time
 │   ├── providers/           ← QueryProvider, AppConfigProvider, LiveModeProvider
-│   └── types/               ← recent-change, feed-freshness, stream-recent-change
+│   └── types/               ← recent-change, feed-freshness, stream-recent-change, wiki-recent-change
 └── mock-server/             ← empty placeholder (.gitkeep)
 ```
 

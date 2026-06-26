@@ -1,8 +1,8 @@
 import { Platform } from 'react-native';
 
 import { env } from '@/constants/env';
-import { liveLog } from '@/lib/live-mode-log';
-import { extractSseDataPayloads } from '@/lib/parse-sse-buffer';
+import { liveLog } from '@/lib/live/log';
+import { extractSseDataPayloads } from '@/lib/live/parse-sse-buffer';
 import type { StreamRecentChangeEvent } from '@/types/stream-recent-change';
 
 const STREAM_PATH = '/v2/stream/recentchange';

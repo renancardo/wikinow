@@ -22,10 +22,11 @@ Mirror Wikimedia's [Recent Changes "Live updates"](https://www.mediawiki.org/wik
 | Global live state + stream query | [`providers/LiveModeProvider.tsx`](../mobile-app/providers/LiveModeProvider.tsx) |
 | REST + stream merge | [`hooks/useRecentChangesWithLive.ts`](../mobile-app/hooks/useRecentChangesWithLive.ts) |
 | SSE transport | [`api/recent-change-stream.ts`](../mobile-app/api/recent-change-stream.ts) |
-| Stream → `RecentChange` | [`lib/map-stream-event.ts`](../mobile-app/lib/map-stream-event.ts) |
-| Client filters | [`lib/filter-stream-event.ts`](../mobile-app/lib/filter-stream-event.ts) |
+| Stream → `RecentChange` | [`lib/live/map-stream-event.ts`](../mobile-app/lib/live/map-stream-event.ts) |
+| Stream client filters | [`lib/live/filter-stream-event.ts`](../mobile-app/lib/live/filter-stream-event.ts) — canary + enwiki |
+| Tab filter on merge | [`lib/recent-changes/matches-tab-filter.ts`](../mobile-app/lib/recent-changes/matches-tab-filter.ts) |
 | List pin-to-top when live | [`components/ChangesList.tsx`](../mobile-app/components/ChangesList.tsx) |
-| Debug logs | [`lib/live-mode-log.ts`](../mobile-app/lib/live-mode-log.ts) — gated by `liveLogEnabled` config |
+| Debug logs | [`lib/live/log.ts`](../mobile-app/lib/live/log.ts) — gated by `liveLogEnabled` config |
 | Stream buffer cap | `streamBufferMax` in [`constants/app-config.ts`](../mobile-app/constants/app-config.ts) |
 
 **Query keys**
@@ -88,7 +89,7 @@ React Native `fetch()` does **not** stream SSE responses (hangs until connection
 | Web | `fetch` + `ReadableStream` |
 | iOS / Android | `XMLHttpRequest` + `onprogress` |
 
-SSE lines parsed via [`lib/parse-sse-buffer.ts`](../mobile-app/lib/parse-sse-buffer.ts).
+SSE lines parsed via [`lib/live/parse-sse-buffer.ts`](../mobile-app/lib/live/parse-sse-buffer.ts).
 
 ---
 

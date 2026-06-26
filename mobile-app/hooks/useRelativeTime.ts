@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { formatRelativeTime } from '@/lib/format-relative-time';
+import { formatRelativeTime } from '@/lib/utils/format-relative-time';
 import { useAppConfig } from '@/providers/AppConfigProvider';
 
 export function useRelativeTime(timestamp: number | null | undefined): string | null {

@@ -1,4 +1,4 @@
-import { extractSseDataPayloads } from '@/lib/parse-sse-buffer';
+import { extractSseDataPayloads } from '@/lib/live/parse-sse-buffer';
 
 describe('extractSseDataPayloads', () => {
   it('parses complete SSE lines from a chunk', () => {

@@ -1,4 +1,4 @@
-import { getAppConfig } from '@/lib/app-config-store';
+import { getAppConfig } from '@/lib/config/app-config-store';
 
 const LOG_PREFIX = '[WikiNow:Live]';
 

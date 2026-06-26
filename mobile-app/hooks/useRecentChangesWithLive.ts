@@ -1,6 +1,6 @@
 import { useRecentChanges } from '@/hooks/useRecentChanges';
-import { matchesTabFilter } from '@/lib/filter-stream-event';
-import { mergeChanges } from '@/lib/merge-changes';
+import { matchesTabFilter } from '@/lib/recent-changes/matches-tab-filter';
+import { mergeChanges } from '@/lib/recent-changes/merge-changes';
 import { useLiveMode } from '@/providers/LiveModeProvider';
 import { useAppConfig } from '@/providers/AppConfigProvider';
 import type { ChangesTab } from '@/constants/tabs';

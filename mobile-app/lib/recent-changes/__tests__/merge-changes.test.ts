@@ -1,6 +1,6 @@
 import type { RecentChange } from '@/types/recent-change';
 
-import { mergeChanges } from '@/lib/merge-changes';
+import { mergeChanges } from '@/lib/recent-changes/merge-changes';
 
 function change(rcid: number, title = `Page ${rcid}`): RecentChange {
   return {

@@ -1,11 +1,11 @@
 import { connectRecentChangeStream } from '@/api/recent-change-stream';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { useAppFocused } from '@/hooks/useAppFocused';
-import { isGlobalStreamEvent } from '@/lib/filter-stream-event';
-import { getAppConfig } from '@/lib/app-config-store';
-import { liveLog } from '@/lib/live-mode-log';
-import { mapStreamEvent } from '@/lib/map-stream-event';
-import { mergeChanges } from '@/lib/merge-changes';
+import { getAppConfig } from '@/lib/config/app-config-store';
+import { isGlobalStreamEvent } from '@/lib/live/filter-stream-event';
+import { liveLog } from '@/lib/live/log';
+import { mapStreamEvent } from '@/lib/live/map-stream-event';
+import { mergeChanges } from '@/lib/recent-changes/merge-changes';
 import type { RecentChange } from '@/types/recent-change';
 import { experimental_streamedQuery, useQuery, useQueryClient } from '@tanstack/react-query';
 import {

@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 
 import { formatRelativeTime } from '@/lib/format-relative-time';
-
-const TICK_MS = 10_000;
+import { useAppConfig } from '@/providers/AppConfigProvider';
 
 export function useRelativeTime(timestamp: number | null | undefined): string | null {
+  const { config } = useAppConfig();
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
@@ -13,9 +13,9 @@ export function useRelativeTime(timestamp: number | null | undefined): string | 
     }
 
     setNow(Date.now());
-    const intervalId = setInterval(() => setNow(Date.now()), TICK_MS);
+    const intervalId = setInterval(() => setNow(Date.now()), config.tickMs);
     return () => clearInterval(intervalId);
-  }, [timestamp]);
+  }, [timestamp, config.tickMs]);
 
   if (!timestamp) {
     return null;

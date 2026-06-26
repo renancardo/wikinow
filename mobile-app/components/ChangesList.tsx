@@ -1,10 +1,13 @@
-import { FlashList } from '@shopify/flash-list';
+import { FlashList, type FlashListRef } from '@shopify/flash-list';
 import { useRouter } from 'expo-router';
+import { useEffect, useRef } from 'react';
 import {
   ActivityIndicator,
   Pressable,
   RefreshControl,
   StyleSheet,
+  type NativeSyntheticEvent,
+  type NativeScrollEvent,
 } from 'react-native';
 
 import ChangeListItem from '@/components/ChangeListItem';
@@ -14,7 +17,10 @@ import { Text, View } from '@/components/Themed';
 import { TAB_EMPTY_MESSAGES, type ChangesTab } from '@/constants/tabs';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
-import { useRecentChanges } from '@/hooks/useRecentChanges';
+import { useRecentChangesWithLive } from '@/hooks/useRecentChangesWithLive';
+import type { RecentChange } from '@/types/recent-change';
+
+const LIVE_PIN_THRESHOLD = 150;
 
 type ChangesListProps = {
   tab: ChangesTab;
@@ -25,6 +31,9 @@ export default function ChangesList({ tab, emptyMessage }: ChangesListProps) {
   const router = useRouter();
   const colorScheme = useColorScheme();
   const tint = Colors[colorScheme ?? 'light'].tint;
+  const listRef = useRef<FlashListRef<RecentChange>>(null);
+  const scrollOffsetRef = useRef(0);
+  const prevHeadRcidRef = useRef<number | null>(null);
 
   const {
     changes,
@@ -41,7 +50,40 @@ export default function ChangesList({ tab, emptyMessage }: ChangesListProps) {
     hasNextPage,
     isFetchingNextPage,
     isShowingPlaceholder,
-  } = useRecentChanges(tab);
+    isLiveEnabled,
+  } = useRecentChangesWithLive(tab);
+
+  const headRcid = changes[0]?.rcid ?? null;
+
+  useEffect(() => {
+    if (!isLiveEnabled) {
+      prevHeadRcidRef.current = null;
+      return;
+    }
+
+    listRef.current?.scrollToOffset({ offset: 0, animated: false });
+    prevHeadRcidRef.current = headRcid;
+  }, [isLiveEnabled]);
+
+  useEffect(() => {
+    if (!isLiveEnabled || headRcid === null) {
+      return;
+    }
+
+    if (
+      prevHeadRcidRef.current !== null &&
+      headRcid !== prevHeadRcidRef.current &&
+      scrollOffsetRef.current <= LIVE_PIN_THRESHOLD
+    ) {
+      listRef.current?.scrollToOffset({ offset: 0, animated: false });
+    }
+
+    prevHeadRcidRef.current = headRcid;
+  }, [isLiveEnabled, headRcid]);
+
+  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    scrollOffsetRef.current = event.nativeEvent.contentOffset.y;
+  };
 
   const isUpdating =
     isOnline && isFetching && !isFetchingNextPage && !isPending;
@@ -120,12 +162,15 @@ export default function ChangesList({ tab, emptyMessage }: ChangesListProps) {
     <View style={styles.container}>
       {isOffline ? <OfflineBanner lastUpdatedAt={freshness.lastUpdatedAt} /> : null}
       <FlashList
+        ref={listRef}
         data={changes}
         keyExtractor={(item) => String(item.rcid)}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
         maintainVisibleContentPosition={
-          hasCachedData
+          isLiveEnabled || hasCachedData
             ? {
-                autoscrollToTopThreshold: 20,
+                autoscrollToTopThreshold: isLiveEnabled ? LIVE_PIN_THRESHOLD : 20,
               }
             : undefined
         }

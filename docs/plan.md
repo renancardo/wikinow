@@ -135,6 +135,7 @@ v1/
 ├── docs/
 │   ├── architecture.md
 │   ├── cache-behavior.md    ← TanStack Query cache model
+│   ├── live-mode.md         ← SSE live toggle implementation handoff
 │   └── plan.md              ← this file
 ├── mobile-app/              ← Expo app (WikiNow)
 │   ├── app/
@@ -218,6 +219,7 @@ v1/
 |-----|----------|
 | [architecture.md](./architecture.md) | REST vs SSE strategy, eval criteria, stack decisions |
 | [cache-behavior.md](./cache-behavior.md) | How TanStack Query caches per tab/page, timing, persistence, “changes loaded” semantics |
+| [live-mode.md](./live-mode.md) | **SSE live toggle implementation handoff** — stream constraints, merge strategy, files to touch |
 | [plan.md](./plan.md) | This file — status tracker and build order |
 
 ---

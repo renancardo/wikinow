@@ -26,6 +26,9 @@ export default function QueryProvider({ children }: QueryProviderProps) {
       persistOptions={{
         persister: asyncStoragePersister,
         maxAge: 1000 * 60 * 60 * 24,
+        dehydrateOptions: {
+          shouldDehydrateQuery: (query) => query.queryKey[0] !== 'recentchanges-live',
+        },
       }}>
       {children}
       {__DEV__ ? <ReactQueryDevTools /> : null}

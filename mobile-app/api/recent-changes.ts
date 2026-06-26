@@ -1,12 +1,11 @@
 import { env } from '@/constants/env';
+import { getAppConfig } from '@/lib/app-config-store';
 import type { RecentChangesApiFilter } from '@/constants/tabs';
 import {
   mapWikiChange,
   type RecentChangesPage,
   type WikiRecentChangesResponse,
 } from '@/lib/recent-changes';
-
-const PAGE_SIZE = 50;
 
 type FetchRecentChangesParams = {
   filter: RecentChangesApiFilter;
@@ -54,7 +53,7 @@ function buildRecentChangesUrl(filter: RecentChangesApiFilter, cursor?: string):
     format: 'json',
     formatversion: '2',
     list: 'recentchanges',
-    rclimit: String(PAGE_SIZE),
+    rclimit: String(getAppConfig().pageSize),
     rcprop: 'title|user|timestamp|ids',
   });
 

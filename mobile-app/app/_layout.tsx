@@ -8,6 +8,7 @@ import 'react-native-reanimated';
 
 import { useColorScheme } from '@/components/useColorScheme';
 import QueryProvider from '@/providers/QueryProvider';
+import { AppConfigProvider } from '@/providers/AppConfigProvider';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -46,21 +47,29 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
+  return (
+    <QueryProvider>
+      <AppConfigProvider>
+        <ThemedNavigation />
+      </AppConfigProvider>
+    </QueryProvider>
+  );
+}
+
+function ThemedNavigation() {
   const colorScheme = useColorScheme();
 
   return (
-    <QueryProvider>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen
-            name="detail"
-            options={({ route }) => ({
-              title: (route.params as { title?: string })?.title ?? 'Page',
-            })}
-          />
-        </Stack>
-      </ThemeProvider>
-    </QueryProvider>
+    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <Stack>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="detail"
+          options={({ route }) => ({
+            title: (route.params as { title?: string })?.title ?? 'Page',
+          })}
+        />
+      </Stack>
+    </ThemeProvider>
   );
 }

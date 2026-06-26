@@ -11,6 +11,8 @@ export function setupQueryManagers() {
   initialized = true;
 
   focusManager.setEventListener((handleFocus) => {
+    handleFocus(AppState.currentState === 'active');
+
     const subscription = AppState.addEventListener('change', (state: AppStateStatus) => {
       handleFocus(state === 'active');
     });

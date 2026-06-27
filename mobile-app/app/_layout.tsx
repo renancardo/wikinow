@@ -68,11 +68,21 @@ function ThemedNavigation() {
         screenOptions={{
           headerShadowVisible: false,
         }}>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="(tabs)"
+          options={{
+            headerShown: false,
+            // Avoid iOS showing "(tabs)" as the back button label on pushed screens.
+            title: 'Changes',
+          }}
+        />
         <Stack.Screen
           name="detail"
           options={({ route }) => ({
             title: (route.params as { title?: string })?.title ?? 'Page',
+            headerLargeTitle: false,
+            headerBackButtonDisplayMode: 'minimal',
+            headerBackTitleVisible: false,
           })}
         />
       </Stack>

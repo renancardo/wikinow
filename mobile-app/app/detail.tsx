@@ -88,7 +88,7 @@ export default function DetailScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['bottom']}>
       {loading && (
         <View style={styles.loadingOverlay}>
           <ActivityIndicator size="large" color={tint} />
@@ -97,9 +97,11 @@ export default function DetailScreen() {
       <WebView
         key={retryKey}
         ref={webViewRef}
+        style={styles.webView}
         source={{ uri: url }}
         setSupportMultipleWindows={false}
         allowsBackForwardNavigationGestures={Platform.OS === 'ios'}
+        contentInsetAdjustmentBehavior="never"
         onNavigationStateChange={handleNavigationStateChange}
         onLoadStart={() => {
           setLoading(true);
@@ -121,6 +123,9 @@ export default function DetailScreen() {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+  },
+  webView: {
     flex: 1,
   },
   centered: {
